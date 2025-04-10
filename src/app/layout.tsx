@@ -1,3 +1,4 @@
+import CustomLayout from "@/components/custom-layout";
 import { ThemeProvider } from "@/components/theme-provider";
 import {
   ClerkProvider
@@ -16,22 +17,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="pt-br" suppressHydrationWarning>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/images/icon.jpeg" />
-        <head />
-        <body>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <CustomLayout>
+      <ClerkProvider>
+        <html lang="pt-br" suppressHydrationWarning>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" href="/images/icon.jpeg" />
+          <head />
+          <body>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </body>
+        </html>
+      </ClerkProvider>
+    </CustomLayout>
   );
 }

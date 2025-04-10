@@ -8,15 +8,68 @@ datasource db {
 }
 
 model User {
-  id              String    @id @default(cuid())
+  id              String          @id @default(cuid())
   name            String?
-  clerk_id        String?   @unique
-  username        String?   @unique
+  clerk_id        String?         @unique
+  username        String?         @unique
   image           String?
-  email           String?   @unique
+  email           String?         @unique
   password        String?
   dateNce         DateTime?
-  marketingEmails Boolean?  @default(false)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  channels        ChannelMember[]
+  marketingEmails Boolean?        @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  Server          Server[]
+  Message         Message[]
+}
+
+model Server {
+  id        String          @id @default(cuid())
+  name      String
+  ownerId   String
+  image     String?
+  owner     User            @relation(fields: [ownerId], references: [clerk_id])
+  channels  Channel[]
+  members   ChannelMember[]
+  createdAt DateTime        @default(now())
+}
+
+model Channel {
+  id        String    @id @default(cuid())
+  name      String
+  serverId  String
+  server    Server    @relation(fields: [serverId], references: [id])
+  messages  Message[]
+  bot       Bot?      @relation(fields: [botId], references: [id])
+  botId     String?   @unique
+  createdAt DateTime  @default(now())
+}
+
+model ChannelMember {
+  id       String   @id @default(cuid())
+  userId   String
+  serverId String
+  user     User     @relation(fields: [userId], references: [clerk_id])
+  server   Server   @relation(fields: [serverId], references: [id])
+  joinedAt DateTime @default(now())
+
+  @@unique([userId, serverId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  channelId String
+  user      User     @relation(fields: [userId], references: [clerk_id])
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Bot {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  channel     Channel?
 }

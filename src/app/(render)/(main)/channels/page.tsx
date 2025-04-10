@@ -14,15 +14,8 @@ const Channels = () => {
   };
 
   return (
-    <div className="flex flex-col">
-      <h1 className="text-2xl font-bold">Channels</h1>
-      <p className="mt-4 text-gray-600">This is the Channels page.</p>
-      <button
-        onClick={handleSignOut}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Sign Out
-      </button>
+    <div className="w-full h-full flex flex-col dark:bg-[#003596b00]">
+      <span>flex flex-col items-center justify-center</span>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { createUser } from "@/app/actions/user"
 import VerifyCode from "@/components/verfique-code"
-import { useAuth } from "@/services/authServices"
+import { useAuth } from "@/services/auth/authServices"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import RegisterForm from "./form-register"

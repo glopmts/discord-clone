@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import VefiqueCode from "@/components/verfique-code"
-import { useAuth } from "@/services/authServices"
+import { useAuth } from "@/services/auth/authServices"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -45,7 +45,7 @@ const LoginPage = () => {
       })
 
       if (result.success) {
-        router.push("/dashboard")
+        router.push("/channels/me")
         return
       }
 

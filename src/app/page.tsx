@@ -14,7 +14,7 @@ export default function Page() {
     if (!user) {
       router.push("/login");
     } else {
-      router.push("/channels");
+      router.push("/channels/me");
     }
   }, [user, isLoaded, router]);
 

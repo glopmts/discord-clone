@@ -58,3 +58,33 @@ export async function getUserByClerkId(clerkId: string) {
     return null
   }
 }
+
+export async function getUserDetails(userId: string) {
+  try {
+    if (!userId) {
+      throw new Error("User ID is required!")
+    }
+
+    const user = await db.user.findUnique({
+      where: {
+        clerk_id: userId,
+      },
+      include: {
+        Message: true,
+        channels: true,
+        Server: true,
+      },
+    })
+
+    if (!user) {
+      throw new Error("User not found!")
+    }
+
+    return user
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to fetch user: ${error.message}`)
+    }
+    throw new Error("Failed to fetch user")
+  }
+}

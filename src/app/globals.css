@@ -120,3 +120,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+.scrollarea-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollarea-viewport {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}

@@ -1,7 +1,7 @@
 "use client"
 
 import { Input } from "@/components/ui/input"
-import { useAuth } from "@/services/authServices"
+import { useAuth } from "@/services/auth/authServices"
 import { type FC, useState } from "react"
 
 type VerifyCodeProps = {
