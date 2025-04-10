@@ -88,3 +88,45 @@ export async function getUserDetails(userId: string) {
     throw new Error("Failed to fetch user")
   }
 }
+
+
+export async function updateUser(userData: {
+  userId: string
+  name?: string
+  username?: string
+  image?: string
+}) {
+  try {
+    if (!userData.userId) {
+      throw new Error("User ID is required!")
+    }
+
+    const userIdentific = await db.user.findUnique({
+      where: {
+        clerk_id: userData.userId,
+      },
+    })
+
+    if (!userIdentific) {
+      throw new Error("User not found!")
+    }
+
+    const update = await db.user.update({
+      where: {
+        clerk_id: userData.userId
+      },
+      data: {
+        name: userData.name,
+        username: userData.username,
+        image: userData.image || "",
+      }
+    })
+
+    return update
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed update user: ${error.message}`)
+    }
+    throw new Error("Failed update user")
+  }
+}

@@ -129,3 +129,23 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 12px;
+}
+
+/* Para o "trilho" (fundo da scrollbar) */
+::-webkit-scrollbar-track {
+  background: #2e2e2e; /* Cor de fundo */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #5c5a5a; 
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

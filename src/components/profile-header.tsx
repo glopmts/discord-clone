@@ -8,12 +8,15 @@ import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Button } from "./ui/button"
 import ModalUserDetails from "./user/details-user-modal"
+import InterfacePageConfigs from "./user/details-user-page"
+import { AlertEditeProfile } from "./user/modal-edite-profile"
 
 const ProfileHeader = ({ userId }: UserIdProps) => {
   const {
     data: user,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["user", userId],
     queryFn: () => getUserDetails(userId),
@@ -23,6 +26,8 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
   const [isHeadphone, setHeadphone] = useState(false);
   const [isOnline, setOnline] = useState(false);
   const [isModal, setModal] = useState(false);
+  const [isScreen, setFullScreen] = useState(false);
+  const [isModalEdite, setModalEdite] = useState(false);
 
   const handleMic = () => {
     setMic(!isMic);
@@ -34,6 +39,15 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
 
   const handleModal = () => {
     setModal(!isModal);
+  }
+
+  const handleFullScreen = () => {
+    setFullScreen(!isScreen);
+  }
+
+  const handleEditProfile = () => {
+    setModalEdite(true);
+    setModal(false);
   }
 
   if (error) {
@@ -56,7 +70,7 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
             <div className="flex items-center justify-between px-2 w-full h-full">
               <div className="flex items-center gap-2" onClick={handleModal}>
                 <div className="relative">
-                  <Avatar className="h-9 w-9 rounded-full relative">
+                  <Avatar className="h-9 w-10 rounded-full relative">
                     <AvatarImage src={user?.image ?? "No image user"} alt="User avatar" />
                     <AvatarFallback>
                       {user?.username?.charAt(0).toUpperCase()}
@@ -65,7 +79,7 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
                   <div className={`absolute bottom-0 top-5 right-0 ${isOnline ? "bg-green-500" : "bg-zinc-600"} border-2 border-zinc-900 p-1.5 rounded-full`}></div>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium text-white">GlopMts</span>
+                  <span className="text-sm font-medium text-white">{user?.name}</span>
                   <span className="text-xs text-zinc-400">Disponível</span>
                 </div>
               </div>
@@ -76,7 +90,7 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
                 <Button variant={isHeadphone ? 'ghost' : 'micOffIcon'} onClick={handHeadphone} className="text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer">
                   {isHeadphone ? <HeadphonesIcon size={28} /> : <HeadphoneOff color="red" size={28} />}
                 </Button>
-                <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer">
+                <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer" onClick={handleFullScreen}>
                   <Settings size={28} />
                 </Button>
               </div>
@@ -91,6 +105,28 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
           userId={userId}
           username={user?.username!}
           image={user?.image!}
+          isOnline={isOnline}
+          onEditProfile={handleEditProfile}
+        />
+      )}
+
+      {isScreen && (
+        <InterfacePageConfigs
+          isOpen={isScreen}
+          onClose={() => setFullScreen(false)}
+          userId={userId}
+          user={user!}
+          isOnline={isOnline}
+        />
+      )}
+
+      {isModalEdite && (
+        <AlertEditeProfile
+          isOpen={isModalEdite}
+          user={user!}
+          userId={userId!}
+          refetch={refetch}
+          onClose={() => setModalEdite(false)}
         />
       )}
     </>
