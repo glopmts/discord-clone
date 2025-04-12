@@ -1,10 +1,8 @@
-
 type InterfaceLinks = {
   handlePerfil: () => void;
 }
 
 export const getLinksNavegation = ({ handlePerfil }: InterfaceLinks) => [
-
   {
     id: 1,
     label: "Minha conta",

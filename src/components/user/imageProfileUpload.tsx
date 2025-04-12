@@ -1,17 +1,18 @@
 import { UploadDropzone } from "@/utils/uploadthing";
-import { useUser } from "@clerk/nextjs";
 import { Loader, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "../ui/button";
 
 export function ImageUploader({ value, onChange }: { value?: string; onChange: (url?: string) => void }) {
-  const { user } = useUser();
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   return (
     <div className="space-y-4">
+      {error &&
+        <div className="text-center text-red-500 font-semibold">{error}</div>
+      }
       {value ? (
         <div className="relative group">
           <div className="flex items-center relative justify-center">

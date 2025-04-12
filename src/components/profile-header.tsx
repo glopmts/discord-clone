@@ -29,21 +29,14 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
   const [isScreen, setFullScreen] = useState(false);
   const [isModalEdite, setModalEdite] = useState(false);
 
-  const handleMic = () => {
-    setMic(!isMic);
+  const createToggleHandler = (setter: React.Dispatch<React.SetStateAction<boolean>>, currentValue: boolean) => {
+    return () => setter(!currentValue);
   }
 
-  const handHeadphone = () => {
-    setHeadphone(!isHeadphone);
-  }
-
-  const handleModal = () => {
-    setModal(!isModal);
-  }
-
-  const handleFullScreen = () => {
-    setFullScreen(!isScreen);
-  }
+  const handleMic = createToggleHandler(setMic, isMic);
+  const handHeadphone = createToggleHandler(setHeadphone, isHeadphone);
+  const handleModal = createToggleHandler(setModal, isModal);
+  const handleFullScreen = createToggleHandler(setFullScreen, isScreen);
 
   const handleEditProfile = () => {
     setModalEdite(true);

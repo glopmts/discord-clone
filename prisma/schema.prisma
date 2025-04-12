@@ -15,7 +15,9 @@ model User {
   image           String?
   email           String?         @unique
   password        String?
+  description     String?
   dateNce         DateTime?
+  admin           Roles           @default(user)
   channels        ChannelMember[]
   marketingEmails Boolean?        @default(false)
   createdAt       DateTime        @default(now())
@@ -36,14 +38,16 @@ model Server {
 }
 
 model Channel {
-  id        String    @id @default(cuid())
-  name      String
-  serverId  String
-  server    Server    @relation(fields: [serverId], references: [id])
-  messages  Message[]
-  bot       Bot?      @relation(fields: [botId], references: [id])
-  botId     String?   @unique
-  createdAt DateTime  @default(now())
+  id          String       @id @default(cuid())
+  name        String
+  serverId    String
+  server      Server       @relation(fields: [serverId], references: [id])
+  messages    Message[]
+  typeChannel ChannelTypes @default(text)
+  isPrivate   Boolean      @default(false)
+  bot         Bot?         @relation(fields: [botId], references: [id])
+  botId       String?      @unique
+  createdAt   DateTime     @default(now())
 }
 
 model ChannelMember {
@@ -72,4 +76,17 @@ model Bot {
   name        String
   description String?
   channel     Channel?
+}
+
+enum Roles {
+  admin
+  user
+}
+
+enum ChannelTypes {
+  text
+  Voz
+  forum
+  announcement
+  stage
 }
