@@ -25,7 +25,7 @@ export default function DasherboardLayout({
       <div className="flex relative flex-1 w-full overflow-hidden">
         <ProfileHeader userId={userId} />
         <SideBarServes userId={userId} />
-        <SiderBarInfors />
+        <SiderBarInfors userId={userId} />
         <div className="flex-1 overflow-auto">
           {children}
         </div>

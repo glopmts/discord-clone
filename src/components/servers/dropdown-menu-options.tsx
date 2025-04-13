@@ -7,18 +7,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { LucideArrowBigDown, PlusCircle, Settings, Users } from "lucide-react";
+import { FolderPlus, LucideArrowBigDown, PlusCircle, Settings, Users } from "lucide-react";
+import { useState } from "react";
 
 type DropdownMenuProps = {
   name: string;
   handleNewsChannel: () => void;
+  handleNewsCategory: () => void;
 }
 
 type FunctionsProps = {
   handleNewsChannel: () => void;
+  handleNewsCategory: () => void;
 }
 
-const navegaTions = ({ handleNewsChannel }: FunctionsProps) => [
+const navegaTions = ({ handleNewsChannel, handleNewsCategory }: FunctionsProps) => [
   {
     id: 1,
     label: "Convidar pessoas",
@@ -35,14 +38,39 @@ const navegaTions = ({ handleNewsChannel }: FunctionsProps) => [
     id: 3,
     label: "Criar um canal",
     icon: PlusCircle,
-    onClick: handleNewsChannel
+    onClick: (closeDropdown: () => void) => {
+      handleNewsChannel();
+      closeDropdown();
+    }
+  },
+  {
+    id: 4,
+    label: "Criar categoria",
+    icon: FolderPlus,
+    onClick: (closeDropdown: () => void) => {
+      handleNewsCategory();
+      closeDropdown();
+    }
   }
 ];
 
-export default function MenuOptionsInfor({ name, handleNewsChannel }: DropdownMenuProps) {
+export default function MenuOptionsInfor({
+  name,
+  handleNewsChannel,
+  handleNewsCategory
+}: DropdownMenuProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleCloseDropdown = () => {
+    setIsOpen(false);
+  };
+
+  const handleItemClick = (itemOnClick: (closeDropdown: () => void) => void) => {
+    itemOnClick(handleCloseDropdown);
+  };
 
   return (
-    <DropdownMenu dir="ltr" modal>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger className="flex items-center justify-between w-full cursor-pointer">
         <span className="font-semibold text-white truncate">{name}</span>
         <LucideArrowBigDown size={20} className="text-zinc-500" />
@@ -50,11 +78,11 @@ export default function MenuOptionsInfor({ name, handleNewsChannel }: DropdownMe
       <DropdownMenuContent className={cn("w-[14rem]")}>
         <DropdownMenuLabel>Impulso de servidor</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {navegaTions({ handleNewsChannel }).map((nv) => (
+        {navegaTions({ handleNewsChannel, handleNewsCategory }).map((nv) => (
           <DropdownMenuItem
             key={nv.id}
             className="flex w-full items-center justify-between"
-            onClick={nv.onClick}
+            onClick={() => handleItemClick(nv.onClick)}
           >
             {nv.label}
             <nv.icon size={23} />
@@ -62,6 +90,5 @@ export default function MenuOptionsInfor({ name, handleNewsChannel }: DropdownMe
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-
   )
 }

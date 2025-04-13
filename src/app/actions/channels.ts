@@ -8,16 +8,17 @@ export async function createChannel(data: {
   name: string,
   typeChannel: ChannelTypes,
   isPrivate: boolean,
+  categoryId?: string
 }) {
   try {
-
     if (!data.serverId) {
       throw new Error("ID is required server!")
     }
 
     const createChanell = await db.channel.create({
       data: {
-        ...data
+        ...data,
+        categoryId: data.categoryId || null
       }
     })
 
@@ -29,7 +30,6 @@ export async function createChannel(data: {
     throw new Error("Failed create channel")
   }
 }
-
 export async function getChannelId(id: string) {
   try {
     if (!id) {

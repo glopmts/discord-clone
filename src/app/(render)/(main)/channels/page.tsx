@@ -89,7 +89,7 @@ const Channels = () => {
                 💬 <Dot size={16} /> <span className="truncate">{channel?.name}</span>
               </div>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-3.5">
               <Bell size={18} className="text-zinc-400" />
               <Pin size={18} className="text-zinc-400" />
               <Users size={18} className="text-zinc-400" />
@@ -99,6 +99,11 @@ const Channels = () => {
               </div>
             </div>
           </div>
+          {error && (
+            <div className="text-center text-base mb-4 mt-4 font-semibold text-red-600">
+              {error.message}
+            </div>
+          )}
           <Separator className="bg-zinc-800 h-0.5 mt-3" />
         </div>
 

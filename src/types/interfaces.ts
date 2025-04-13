@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { ChannelTypes, User } from "@prisma/client";
 
 export type UserIdProps = {
   userId: string;
@@ -10,6 +10,7 @@ export type ModalProps = {
   user?: User | null;
   userId?: string;
   serverId?: string;
+  categoryId?: string;
   refetch: () => void;
 }
 
@@ -42,4 +43,34 @@ export type MessagePropsRender = {
     };
   }>;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
+}
+
+export interface InterfacesRender {
+  server: {
+    name: string;
+    id: string;
+    createdAt: Date;
+    Category: {
+      id: string;
+      name: string;
+      channels: {
+        id: string;
+        name: string;
+        typeChannel: ChannelTypes;
+        createdAt: Date;
+        serverId: string;
+        categoryId: string | null;
+        isPrivate: boolean;
+        botId: string | null;
+      }[];
+    }[];
+    members?: any[];
+  };
+
+  handleNewsChannel: (categoryId?: string) => void;
+  handleNewsCategory: () => void;
+  handleServerClick: (id: string) => void;
+  handleEdite: () => void;
+  currentChannelId?: string;
+  handleDelete: (categoryId: string, categoryName: string) => void;
 }

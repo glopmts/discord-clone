@@ -45,6 +45,11 @@ export async function geServer(id: string) {
       },
       include: {
         channels: true,
+        Category: {
+          include: {
+            channels: true,
+          }
+        },
         members: {
           include: {
             user: true,
@@ -62,32 +67,45 @@ export async function geServer(id: string) {
   }
 }
 
-
-
 export async function createNewsServers(data: {
-  userId: string;
+  userId: string | undefined;
   name: string;
   image: string;
 }) {
   try {
-
     if (!data.userId || !data.name) {
-      throw new Error("User ID is required or name!")
+      throw new Error("User ID and name are required!")
     }
 
-    const createServe = await db.server.create({
+    const server = await db.server.create({
       data: {
         ownerId: data.userId,
         name: data.name,
-        image: data.image,
+        image: data.image
       }
     })
 
-    return createServe
+    const category = await db.category.create({
+      data: {
+        name: "Canais de Texto",
+        serverId: server.id,
+        channels: {
+          create: {
+            name: "geral",
+            serverId: server.id,
+            typeChannel: "TEXT"
+          }
+        }
+      }
+    })
+
+    return { server, category }
+
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Failed create server: ${error.message}`)
+      throw new Error(`Failed to create server: ${error.message}`)
     }
-    throw new Error("Failed create server")
+    throw new Error("Failed to create server")
   }
 }
+

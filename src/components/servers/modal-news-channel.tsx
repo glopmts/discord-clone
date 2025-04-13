@@ -1,5 +1,3 @@
-"use client"
-
 import { createChannel } from "@/app/actions/channels";
 import {
   AlertDialog,
@@ -13,6 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { ModalProps } from "@/types/interfaces";
+import { channelTypes } from "@/types/typesChannels";
 import { ChannelTypes } from "@prisma/client";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -25,27 +24,20 @@ type TypeForm = {
   isPrivate: boolean;
 }
 
-const channelTypes = [
-  { type: "text", label: "Texto", icon: "💬", description: "Envie mensagens, imagens, GIFs, emojis, opiniões e piadas ruins" },
-  { type: "Voz", label: "Voz", icon: "🔊", description: "Hang out together with voice and video" },
-  { type: "forum", label: "Fórum", icon: "📝", description: "Crie tópicos para discussão organizada" },
-  { type: "announcement", label: "Anúncios", icon: "📢", description: "Compartilhe atualizações importantes" },
-  { type: "stage", label: "Palco", icon: "🎤", description: "Eventos para grandes audiências" }
-];
-
 export default function ModalCreateChannels(
   {
     isOpen,
     onClose,
     refetch,
-    serverId
+    serverId,
+    categoryId
   }: ModalProps
 ) {
   const [loader, setLoader] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [form, setForm] = useState<TypeForm>({
     name: "",
-    typeChannel: "text",
+    typeChannel: "TEXT",
     isPrivate: false,
   });
 
@@ -56,7 +48,8 @@ export default function ModalCreateChannels(
         serverId: serverId as string,
         name: form.name,
         typeChannel: form.typeChannel,
-        isPrivate: isPrivate
+        isPrivate: isPrivate,
+        categoryId: categoryId
       });
       toast.success("Canal criado com sucesso!")
       refetch?.();
