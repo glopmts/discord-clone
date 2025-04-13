@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import MemberServer from "./infor-bar/meber-server"
+import MemberServer from "./infor-bar/member-server"
 import renderDirectMessages from "./infor-bar/renderDirectMessages"
 import { renderModalContent } from "./infor-bar/renderModalContent"
 import GenericModal from "./modals/GenericModal"
@@ -26,6 +26,7 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
   const id = searchParams.get("id");
   const router = useRouter();
   const currentChannelId = searchParams.get("chaId");
+
   const [selectedCategoryForDelete, setSelectedCategoryForDelete] = useState<{
     id: string;
     name: string;
@@ -155,7 +156,6 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
   };
 
 
-
   const getModalTitle = () => {
     switch (modalState.variant) {
       case "createChannel": return "Criar canal";
@@ -241,7 +241,6 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
               <MemberServer server={server!} />
             </ScrollArea>
           </div>
-
         </ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem>Criar um canal</ContextMenuItem>
@@ -250,8 +249,8 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
         </ContextMenuContent>
       </ContextMenu>
 
-      {/* modals functions */}
 
+      {/* modal */}
 
       <GenericModal
         isOpen={modalState.isOpen}

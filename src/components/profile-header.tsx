@@ -12,6 +12,7 @@ import InterfacePageConfigs from "./user/details-user-page"
 import { AlertEditeProfile } from "./user/modal-edite-profile"
 
 const ProfileHeader = ({ userId }: UserIdProps) => {
+
   const {
     data: user,
     isLoading,

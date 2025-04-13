@@ -1,4 +1,6 @@
+import { cn } from "@/lib/utils";
 import { User } from "@prisma/client";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 type ServerProps = {
   server: {
@@ -27,8 +29,13 @@ const MemberServer = ({
                 key={member.id}
                 className="flex items-center px-3 py-1.5 hover:bg-zinc-700/50 rounded-sm cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-full bg-zinc-700 mr-2"></div>
-                <div>
+                <Avatar className={cn("w-9 h-9")}>
+                  <AvatarImage src={member.user?.image ?? "G"} />
+                  <AvatarFallback>
+                    {member.user?.name?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="ml-3">
                   <p className="text-sm text-white">{member.user?.name || "Usuário"}</p>
                   <p className="text-xs text-neutral-400">
                     {member.user?.admin === "admin" ? "Administrador" : "Membro"}

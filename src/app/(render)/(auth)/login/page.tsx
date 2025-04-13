@@ -66,7 +66,7 @@ const LoginPage = () => {
   }
 
   const handleCodeSuccess = () => {
-    router.push("/channels")
+    router.push("/channels/me")
   }
 
   return (

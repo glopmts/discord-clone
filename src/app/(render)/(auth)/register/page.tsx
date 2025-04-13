@@ -44,7 +44,7 @@ export default function RegisterPage() {
 
       sessionStorage.removeItem('registrationData');
 
-      router.push("/channels");
+      router.push("/channels/me");
     } catch (error) {
       console.error("Error in verification success:", error);
     }

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { FolderPlus, LucideArrowBigDown, PlusCircle, Settings, Users } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 
 type DropdownMenuProps = {
@@ -76,7 +77,15 @@ export default function MenuOptionsInfor({
         <LucideArrowBigDown size={20} className="text-zinc-500" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className={cn("w-[14rem]")}>
-        <DropdownMenuLabel>Impulso de servidor</DropdownMenuLabel>
+        <DropdownMenuLabel className="flex items-center justify-between">
+          <span>Impulso de servidor</span>
+          <Image src="/icons/impuso-icon.png"
+            alt="impuso-icon"
+            width={15}
+            height={15}
+            className="filter  hue-rotate-690"
+          />
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {navegaTions({ handleNewsChannel, handleNewsCategory }).map((nv) => (
           <DropdownMenuItem

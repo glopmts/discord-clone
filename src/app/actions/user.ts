@@ -65,7 +65,7 @@ export async function getUserDetails(userId: string) {
       throw new Error("User ID is required!")
     }
 
-    const user = await db.user.findUnique({
+    let user = await db.user.findUnique({
       where: {
         clerk_id: userId,
       },
@@ -77,15 +77,27 @@ export async function getUserDetails(userId: string) {
     })
 
     if (!user) {
-      throw new Error("User not found!")
+      user = await db.user.create({
+        data: {
+          clerk_id: userId,
+          name: "Usuário Temporário",
+          email: `${userId}@placeholder.com`,
+          image: "",
+        },
+        include: {
+          Message: true,
+          channels: true,
+          Server: true,
+        },
+      })
     }
 
     return user
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Failed to fetch user: ${error.message}`)
+      throw new Error(`Failed to fetch or create user: ${error.message}`)
     }
-    throw new Error("Failed to fetch user")
+    throw new Error("Failed to fetch or create user")
   }
 }
 

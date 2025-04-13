@@ -39,7 +39,7 @@ export function ImageUploader({ value, onChange }: { value?: string; onChange: (
         <div className="flex flex-col items-center gap-4">
           <UploadDropzone
             endpoint="profileImage"
-            className="w-48 h-32"
+            className="w-68 h-32"
             onUploadBegin={() => setIsUploading(true)}
             onClientUploadComplete={(res) => {
               if (res?.[0]?.ufsUrl) {
@@ -52,7 +52,7 @@ export function ImageUploader({ value, onChange }: { value?: string; onChange: (
             }}
             appearance={{
               label: "text-primary hover:text-primary/90",
-              uploadIcon: "text-primary",
+              uploadIcon: "hidden",
             }}
           />
 

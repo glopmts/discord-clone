@@ -2,33 +2,55 @@
 
 import { db } from "@/lib/db";
 
-export async function getUserServers(userId: string) {
+export async function getUserServersWithUnreadCount(userId: string) {
   try {
-
     if (!userId) {
-      throw new Error("User ID is required!")
+      throw new Error("User ID is required!");
     }
 
     const servers = await db.server.findMany({
       where: {
-        ownerId: userId
+        OR: [
+          { ownerId: userId },
+          { members: { some: { userId } } }
+        ]
       },
       include: {
         channels: {
-          include: {
-            messages: true
-          }
+          select: { id: true }
         },
         members: true,
       }
-    })
+    });
 
-    return servers
+    const serversWithCount = await Promise.all(
+      servers.map(async (server) => {
+        const unreadCount = await db.message.count({
+          where: {
+            channel: {
+              serverId: server.id
+            },
+            MessageRead: {
+              none: {
+                userId: userId
+              }
+            }
+          }
+        });
+
+        return {
+          ...server,
+          unreadCount
+        };
+      })
+    );
+
+    return serversWithCount;
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Failed get servers: ${error.message}`)
+      throw new Error(`Failed to get servers: ${error.message}`);
     }
-    throw new Error("Failed get servers")
+    throw new Error("Failed to get servers");
   }
 }
 
@@ -109,3 +131,50 @@ export async function createNewsServers(data: {
   }
 }
 
+export async function geServerCode(id: string) {
+  try {
+
+    if (!id) {
+      throw new Error("ID is required!")
+    }
+
+    const server = await db.server.findUnique({
+      where: {
+        inviteCode: id
+      },
+      include: {
+        members: true,
+        channels: {
+          select: {
+            id: true
+          }
+        }
+      }
+    })
+
+    return server
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed get server code: ${error.message}`)
+    }
+    throw new Error("Failed get server code")
+  }
+}
+
+export async function joinServer(userId: string, serverId: string) {
+  try {
+    if (!userId || !serverId) throw new Error("Missing userId or serverId");
+
+    await db.channelMember.create({
+      data: {
+        userId,
+        serverId
+      }
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to join server:", error);
+    return { success: false, message: error instanceof Error ? error.message : "Unknown error" };
+  }
+}

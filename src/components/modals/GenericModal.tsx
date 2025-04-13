@@ -3,17 +3,16 @@
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { ReactNode, useState } from "react";
 
-type ModalVariant = "createChannel" | "createCategory" | "delete";
+type ModalVariant = "createChannel" | "createCategory" | "delete" | "convite";
 
 interface GenericModalProps {
   isOpen: boolean;
@@ -32,9 +31,6 @@ export default function GenericModal({
   isOpen,
   onClose,
   variant,
-  serverId,
-  categoryId,
-  refetch,
   title,
   description,
   onConfirm,
@@ -76,9 +72,9 @@ export default function GenericModal({
         {renderContent()}
 
         <AlertDialogFooter>
-          <AlertDialogCancel className="bg-transparent border-none text-white hover:bg-[#2a2a2e] hover:text-white">
+          <button onClick={onClose} className={cn("text-blue-600 mr-4 cursor-pointer hover:opacity-65")}>
             Cancelar
-          </AlertDialogCancel>
+          </button>
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={loader}
