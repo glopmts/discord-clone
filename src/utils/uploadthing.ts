@@ -1,4 +1,3 @@
-// utils/uploadthing.ts
 import { OurFileRouter } from "@/app/api/uploadthing/core";
 import {
   generateReactHelpers,

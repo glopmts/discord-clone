@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { User } from "@prisma/client";
+import { useState } from "react";
+import DetailsMembers from "../modals/details-members-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 type ServerProps = {
@@ -14,6 +16,14 @@ type ServerProps = {
 const MemberServer = ({
   server
 }: ServerProps) => {
+  const [isOpen, setOpen] = useState(false);
+  const [selectMember, setSelectMember] = useState<string | null>(null);
+
+  const handleInfor = (id: string) => {
+    setOpen(!isOpen)
+    setSelectMember(id)
+  }
+
   return (
     <div className="p-2">
       {server && server.members && server.members.length > 0 && (
@@ -27,6 +37,7 @@ const MemberServer = ({
             {server.members.map((member) => (
               <div
                 key={member.id}
+                onClick={() => handleInfor(member.user.clerk_id!)}
                 className="flex items-center px-3 py-1.5 hover:bg-zinc-700/50 rounded-sm cursor-pointer"
               >
                 <Avatar className={cn("w-9 h-9")}>
@@ -45,6 +56,15 @@ const MemberServer = ({
             ))}
           </div>
         </div>
+      )}
+
+      {isOpen && (
+        <DetailsMembers
+          isOpen={isOpen}
+          key={selectMember}
+          memberId={selectMember!}
+          onClose={() => setOpen(false)}
+        />
       )}
     </div>
   );

@@ -10,15 +10,16 @@ import { useQuery } from "@tanstack/react-query"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import MemberServer from "./infor-bar/member-server"
-import renderDirectMessages from "./infor-bar/renderDirectMessages"
-import { renderModalContent } from "./infor-bar/renderModalContent"
-import GenericModal from "./modals/GenericModal"
-import RenderServerChannels from "./servers/renderServerChannels"
-import { Button } from "./ui/button"
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "./ui/context-menu"
-import { ScrollArea } from "./ui/scroll-area"
-import { Skeleton } from "./ui/skeleton"
+import MemberServer from "../infor-bar/member-server"
+import renderDirectMessages from "../infor-bar/renderDirectMessages"
+import { renderModalContent } from "../infor-bar/renderModalContent"
+import GenericModal from "../modals/GenericModal"
+import { Button } from "../ui/button"
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu"
+import { ScrollArea } from "../ui/scroll-area"
+import { Skeleton } from "../ui/skeleton"
+import MenuOptionsInfor from "./dropdown-menu-options"
+import RenderServerChannels from "./renderServerChannels"
 
 
 const SiderBarInfors = ({ userId }: UserIdProps) => {
@@ -174,17 +175,16 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     }
   };
 
-  const isConfirmDisabled = () => {
-    if (modalState.variant === "delete") return false;
-    return !formData.name;
-  };
-
-
   return (
     <>
       <ContextMenu>
         <ContextMenuTrigger>
           <div className="w-[290px] z-[500] h-full border rounded-l-md flex flex-col">
+            {error && (
+              <div className="text-center text-base font-semibold text-red-500">
+                {error.message}
+              </div>
+            )}
             <div className="w-full p-2 flex flex-col">
               {isLoading ? (
                 <div className="space-y-2 p-4">
@@ -195,51 +195,54 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
                 </div>
               ) : server ? (
                 <>
-                  <RenderServerChannels
-                    server={server}
-                    currentChannelId={currentChannelId!}
-                    handleNewsChannel={handleNewsChannel}
-                    handleNewsCategory={handleNewsCategory}
-                    handleServerClick={handleServerClick}
-                    handleDelete={handleDeleteCategory}
-                    handleEdite={() => { }}
-                  />
-                  <div>
-                    {server.channels
-                      .filter(channel => !channel.categoryId)
-                      .map((channel) => {
-                        const channelId = channel.id;
-                        const isActive = currentChannelId === channelId;
-
-                        return (
-                          <div className="w-full" key={channel.id}>
-                            <Button
-                              variant={isActive ? "secondary" : "ghost"}
-                              onClick={() => handleServerClick(channel.id)}
-                              className="w-full justify-start px-3 py-1 text-neutral-400 hover:text-white hover:bg-zinc-700/50 rounded-sm"
-                            >
-                              {channelIcons[channel.typeChannel]}
-                              <span className="truncate">{channel.name}</span>
-                            </Button>
-                          </div>
-                        );
-                      })}
+                  <div className="p-3 flex items-center justify-between">
+                    <MenuOptionsInfor
+                      name={server.name}
+                      handleNewsCategory={handleNewsCategory}
+                      handleNewsChannel={handleNewsChannel}
+                    />
                   </div>
+                  <div className="w-full h-[80vh] overflow-y-scroll scroll-style">
+                    <RenderServerChannels
+                      server={server}
+                      currentChannelId={currentChannelId!}
+                      handleNewsChannel={handleNewsChannel}
+                      handleNewsCategory={handleNewsCategory}
+                      handleServerClick={handleServerClick}
+                      handleDelete={handleDeleteCategory}
+                      handleEdite={() => { }}
+                    />
+                    <div>
+                      {server.channels
+                        .filter(channel => !channel.categoryId)
+                        .map((channel) => {
+                          const channelId = channel.id;
+                          const isActive = currentChannelId === channelId;
 
-                  {error && (
-                    <div className="text-center text-base font-semibold text-red-500">
-                      {error.message}
+                          return (
+                            <div className="w-full" key={channel.id}>
+                              <Button
+                                variant={isActive ? "secondary" : "ghost"}
+                                onClick={() => handleServerClick(channel.id)}
+                                className="w-full justify-start px-3 py-1 text-neutral-400 hover:text-white hover:bg-zinc-700/50 rounded-sm"
+                              >
+                                {channelIcons[channel.typeChannel]}
+                                <span className="truncate">{channel.name}</span>
+                              </Button>
+                            </div>
+                          );
+                        })}
                     </div>
-                  )}
+
+                    <ScrollArea className="flex-1 w-full h-32 mb-15">
+                      <MemberServer server={server!} />
+                    </ScrollArea>
+                  </div>
                 </>
               ) : (
                 renderDirectMessages()
               )}
             </div>
-
-            <ScrollArea className="flex-1 w-full h-32 mb-15">
-              <MemberServer server={server!} />
-            </ScrollArea>
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -17,6 +18,14 @@ export default function Page() {
       router.push("/channels/me");
     }
   }, [user, isLoaded, router]);
+
+  if (!isLoaded) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Image src="/icons/animete-discord.gif" alt="Loading..." width={100} height={100} sizes="100vw" />
+      </div>
+    );
+  }
 
   return null;
 }

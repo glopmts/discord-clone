@@ -1,6 +1,7 @@
 "use server"
 
 import { db } from "@/lib/db"
+import { FriendStatus } from "@prisma/client"
 
 export async function createUser(userData: {
   clerk_id: string
@@ -140,5 +141,48 @@ export async function updateUser(userData: {
       throw new Error(`Failed update user: ${error.message}`)
     }
     throw new Error("Failed update user")
+  }
+}
+
+
+export async function createFriendship(memberId: string, userId: string) {
+  try {
+    if (!memberId || !userId) {
+      throw new Error("User ID is required or membre ID!")
+    }
+
+    const membreAdd = await db.friendship.create({
+      data: {
+        requesterId: userId,
+        addresseeId: memberId,
+        status: "PENDING",
+      }
+    })
+
+    return membreAdd
+
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed create friends: ${error.message}`)
+    }
+    throw new Error("Failed create friends")
+  }
+}
+
+export async function checkFriendshipStatus(addresseeId: string, requesterId: string): Promise<FriendStatus | null> {
+  try {
+    const friendship = await db.friendship.findFirst({
+      where: {
+        OR: [
+          { requesterId, addresseeId },
+          { requesterId: addresseeId, addresseeId: requesterId }
+        ]
+      }
+    });
+
+    return friendship?.status || null;
+  } catch (error) {
+    console.error("Error checking friendship status:", error);
+    return null;
   }
 }

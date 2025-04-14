@@ -2,8 +2,8 @@
 
 import Header from "@/components/header"
 import ProfileHeader from "@/components/profile-header"
-import SiderBarInfors from "@/components/sider-bar-infors"
-import SideBarServes from "@/components/sider-bar-servers"
+import SiderBarInfors from "@/components/servers/sideBar-infors-server"
+import SideBarServes from "@/components/servers/sideBar-servers"
 import { useAuth } from "@clerk/nextjs"
 import type React from "react"
 
@@ -21,7 +21,7 @@ export default function DasherboardLayout({
 
   return (
     <div className="flex relative flex-col h-screen w-full">
-      <Header userId={userId} />
+      <Header />
       <div className="flex relative flex-1 w-full overflow-hidden">
         <ProfileHeader userId={userId} />
         <SideBarServes userId={userId} />

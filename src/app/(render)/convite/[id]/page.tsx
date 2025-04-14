@@ -5,7 +5,6 @@ type PageProps = {
   }
 }
 
-
 export default function ConviteServer({ params }: PageProps) {
   return <ConviteClient id={params.id} />;
 }

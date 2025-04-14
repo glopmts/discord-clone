@@ -1,12 +1,11 @@
 import { channelIcons } from "@/types/iconsChannels"
 import { InterfacesRender } from "@/types/interfaces"
 import { Calendar, LucideListMinus, Plus, Users } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
 import { Button } from "../ui/button"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu"
 import { Separator } from "../ui/separator"
-import MenuOptionsInfor from "./dropdown-menu-options"
 
 
 type FunctionsProps = {
@@ -47,7 +46,15 @@ const RenderServerChannels = ({
   handleDelete,
   handleEdite
 }: InterfacesRender) => {
-  if (!server) return null
+  if (!server) return null;
+
+  const [openItems, setOpenItems] = useState<string[]>(['item-1']);
+
+  useEffect(() => {
+    if (server.Category) {
+      setOpenItems(server.Category.map(cat => `category-${cat.id}`));
+    }
+  }, [server.Category]);
 
   const [contextMenuOpen, setContextMenuOpen] = useState<string | null>(null);
 
@@ -61,15 +68,7 @@ const RenderServerChannels = ({
 
   return (
     <>
-      <div className="p-3 flex items-center justify-between">
-        <MenuOptionsInfor
-          name={server.name}
-          handleNewsCategory={handleNewsCategory}
-          handleNewsChannel={handleNewsChannel}
-        />
-      </div>
       <Separator className="bg-zinc-800" />
-
       <div className="mt-2 mb-3">
         <Button variant="ghost" className="w-full flex justify-baseline">
           <Calendar size={20} className="mr-1 text-zinc-400" />
@@ -84,6 +83,7 @@ const RenderServerChannels = ({
           <span className=" text-zinc-400">Membros</span>
         </Button>
       </div>
+
       <Separator className="bg-zinc-800" />
 
       <div className="mt-4">
@@ -95,8 +95,11 @@ const RenderServerChannels = ({
             return (
               <div className="w-full" key={category.id}>
                 <div className="px-3 flex items-center justify-between group relative">
-                  <Accordion type="multiple" className="w-full">
-                    <AccordionItem value="item-1" className="w-full border-none" >
+                  <Accordion type="multiple"
+                    className="w-full"
+                    value={openItems}
+                    onValueChange={setOpenItems}>
+                    <AccordionItem value={`category-${category.id}`} className="w-full border-none" >
                       <ContextMenu
                         key={contextMenuOpen}
                         onOpenChange={(open) => {

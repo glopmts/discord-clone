@@ -62,7 +62,7 @@ export function AlertEditeProfile({ isOpen, onClose, user, userId, refetch }: Mo
 
   return (
     <AlertDialog open={isOpen}>
-      <AlertDialogContent>
+      <AlertDialogContent className="bg-[#1f1f22] text-white border">
         <AlertDialogHeader>
           <AlertDialogTitle>Editar perfil</AlertDialogTitle>
           <AlertDialogDescription>

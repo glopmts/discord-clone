@@ -149,3 +149,8 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.scroll-style::-webkit-scrollbar {
+  width: 5px;
+  height: 3px;
+}
