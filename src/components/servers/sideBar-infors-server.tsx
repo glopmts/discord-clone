@@ -10,13 +10,11 @@ import { useQuery } from "@tanstack/react-query"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import MemberServer from "../infor-bar/member-server"
 import renderDirectMessages from "../infor-bar/renderDirectMessages"
 import { renderModalContent } from "../infor-bar/renderModalContent"
 import GenericModal from "../modals/GenericModal"
 import { Button } from "../ui/button"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu"
-import { ScrollArea } from "../ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
 import MenuOptionsInfor from "./dropdown-menu-options"
 import RenderServerChannels from "./renderServerChannels"
@@ -233,11 +231,6 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
                           );
                         })}
                     </div>
-
-                    {/* membros do servidor */}
-                    <ScrollArea className="flex-1 w-full h-32 mb-15">
-                      <MemberServer server={server!} refetch={refetch} />
-                    </ScrollArea>
                   </div>
                 </>
               ) : (

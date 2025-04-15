@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/dialog";
 
 import { assignServerRole } from "@/app/actions/member-servers";
+import { getRoleIcon } from "@/components/IconsCargosMembers";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { getRoleIcon } from "@/utils/iconsCargosMembers";
 import { useAuth } from "@clerk/clerk-react";
 import { FriendStatus, Roles } from "@prisma/client";
 import { useMutation, useQuery } from "@tanstack/react-query";

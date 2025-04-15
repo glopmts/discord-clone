@@ -1,8 +1,18 @@
 import { getUserColor } from "@/components/getUsersCores";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { MessagePropsRender } from "@/types/interfaces";
-import { CornerUpRight, Laugh } from "lucide-react";
+import { formatFullDateTime, formatTimeOnly, isFirstMessageOfDay } from "@/utils/formatDate";
+import { Copy, CornerUpRight, EllipsisIcon, Laugh, Pen, Trash2 } from "lucide-react";
 import { FC, useState } from "react";
 
 const emojis = [
@@ -20,24 +30,43 @@ const emojis = [
   }
 ]
 
+
 const RenderMessagens: FC<MessagePropsRender> = ({
   allMessages,
-  messagesEndRef
+  messagesEndRef,
+  handleDeleteMessage
 }) => {
   const [hoveredMessage, setHoveredMessage] = useState<string | null>(null);
+  const [dropdownOpenForMessage, setDropdownOpenForMessage] = useState<string | null>(null);
+
+  const handleCopyMessage = (text: string) => {
+    if (!text) {
+      return null;
+    }
+
+    navigator.clipboard.writeText(text)
+  }
 
   return (
     <div className="mt-4 flex flex-col gap-4">
       {allMessages.length > 0 ? (
-        allMessages.map((msg) => {
+        allMessages.map((msg, index) => {
           const userColor = getUserColor(msg.userId || msg.user.name || "");
+          const isFirstOfDay = isFirstMessageOfDay(allMessages, index)
+          const timeText = isFirstOfDay
+            ? formatFullDateTime(new Date(msg.createdAt))
+            : formatTimeOnly(new Date(msg.createdAt))
 
           return (
             <div
               className="flex items-start gap-2 relative group"
               key={msg.id}
               onMouseEnter={() => setHoveredMessage(msg.id)}
-              onMouseLeave={() => setHoveredMessage(null)}
+              onMouseLeave={() => {
+                if (dropdownOpenForMessage !== msg.id) {
+                  setHoveredMessage(null);
+                }
+              }}
             >
               <Avatar className={cn("w-10 h-10")}>
                 <AvatarImage src={msg.user.image || undefined} />
@@ -51,14 +80,14 @@ const RenderMessagens: FC<MessagePropsRender> = ({
                     {msg.user.name}
                   </span>
                   <span className="text-xs text-zinc-500">
-                    {new Date(msg.createdAt).toLocaleString()}
+                    {timeText}
                   </span>
                 </div>
                 <p className="text-zinc-300">{msg.content}</p>
 
                 {/* Menu que aparece ao passar o mouse */}
-                {hoveredMessage === msg.id && (
-                  <div className="absolute right-10 top-0 flex gap-2 bg-zinc-800 border p-1 rounded-md">
+                {(hoveredMessage === msg.id || dropdownOpenForMessage === msg.id) && (
+                  <div className="absolute right-10 h-10 top-0 flex gap-2 bg-zinc-800 border p-1 rounded-md">
                     <div className="flex items-center gap-1">
                       <div className="flex items-end gap-1.5">
                         {emojis.map((em) => (
@@ -81,6 +110,18 @@ const RenderMessagens: FC<MessagePropsRender> = ({
                           <CornerUpRight size={16} />
                         </button>
                       </div>
+                      <div className="">
+                        <MenuOptions
+                          messageId={msg.id}
+                          dropdownOpen={dropdownOpenForMessage === msg.id}
+                          setDropdownOpen={(open) => {
+                            setDropdownOpenForMessage(open ? msg.id : null);
+                            if (open) setHoveredMessage(msg.id);
+                          }}
+                          handleDeleteMessage={handleDeleteMessage}
+                          handleCopyMessage={() => handleCopyMessage(msg.content)}
+                        />
+                      </div>
                     </div>
                   </div>
                 )}
@@ -97,6 +138,83 @@ const RenderMessagens: FC<MessagePropsRender> = ({
       )}
       <div ref={messagesEndRef} />
     </div>
+  );
+}
+
+
+interface MenuOptionsProps {
+  messageId: string;
+  dropdownOpen: boolean;
+  setDropdownOpen: (open: boolean) => void;
+  handleDeleteMessage: (messageId: string) => void;
+  handleCopyMessage: (text: string) => void;
+}
+
+const MenuOptions: FC<MenuOptionsProps> = ({
+  messageId,
+  dropdownOpen,
+  setDropdownOpen,
+  handleDeleteMessage,
+  handleCopyMessage
+}) => {
+
+  const menuOptions = [
+    {
+      id: 3,
+      label: "Copiar texto",
+      icon: Copy,
+      onchage: handleCopyMessage
+    },
+    {
+      id: 2,
+      label: "Editar menssagem",
+      icon: Pen,
+      onchage: () => { }
+    },
+    {
+      id: 1,
+      label: "Excluir menssagem",
+      type: "delete",
+      icon: Trash2,
+      onchage: handleDeleteMessage
+    }
+  ]
+
+
+  return (
+    <DropdownMenu
+      open={dropdownOpen}
+      onOpenChange={(open) => setDropdownOpen(open)}
+    >
+      <DropdownMenuTrigger asChild>
+        <button
+          className="cursor-pointer hover:bg-zinc-700/60 p-1 rounded-md"
+          onClick={(e) => e.preventDefault()}
+        >
+          <EllipsisIcon size={20} className="text-zinc-400" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className={cn("bg-zinc-800 border z-[800] absolute right-0 -top-20")}>
+        <DropdownMenuLabel className="gap-2.5 flex">
+          {emojis.map((em) => (
+            <Button variant="outline" key={em.id}>
+              {em.content}
+            </Button>
+          ))}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="gap-2.5 flex flex-col">
+          {menuOptions.map((opt) => (
+            <Button key={opt.id}
+              onClick={() => opt.onchage(messageId)}
+              className={`w-full flex items-center cursor-pointer shadow-none justify-between bg-zinc-800 text-white hover:bg-zinc-700/30 ${opt.type === "delete" ? "text-red-500" : ""}`}>
+              {opt.label}
+              <opt.icon />
+            </Button>
+          ))}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

@@ -44,6 +44,7 @@ export type MessagePropsRender = {
     };
   }>;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
+  handleDeleteMessage: (messageId: string) => void;
 }
 
 export interface InterfacesRender {

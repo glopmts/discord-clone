@@ -1,6 +1,6 @@
+import { getRoleIcon } from "@/components/IconsCargosMembers";
 import { cn } from "@/lib/utils";
 import { MenuItem } from "@/types/interfaces";
-import { getRoleIcon } from "@/utils/iconsCargosMembers";
 import { Roles, User } from "@prisma/client";
 import { Ban, MessageSquare, MoreVertical, Shield, User as UserIcon } from "lucide-react";
 import { useState } from "react";

@@ -47,6 +47,7 @@ export async function getChannelId(id: string) {
             user: true,
           }
         },
+        server: true,
         bot: true,
       }
     })
