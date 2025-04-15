@@ -7,19 +7,22 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 
+import { assignServerRole } from "@/app/actions/member-servers";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { getRoleIcon } from "@/utils/iconsCargosMembers";
 import { useAuth } from "@clerk/clerk-react";
-import { FriendStatus } from "@prisma/client";
+import { FriendStatus, Roles } from "@prisma/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Ban, Check, Loader, UserPlus2Icon, UserRoundCog } from "lucide-react";
+import { Ban, Check, Loader, MoreVertical, Shield, Star, User2, UserPlus2Icon, UserRoundCog } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-
 type MenuDetailsProps = {
   memberId: string;
+  serverId: string;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -27,6 +30,7 @@ type MenuDetailsProps = {
 const DetailsMembers = ({
   isOpen,
   memberId,
+  serverId,
   onClose
 }: MenuDetailsProps) => {
   if (!memberId) {
@@ -34,6 +38,7 @@ const DetailsMembers = ({
   }
 
   const { userId } = useAuth();
+  const currentUserId = userId!
   const [friendshipStatus, setFriendshipStatus] = useState<FriendStatus | null>(null);
   const [isLoadingStatus, setIsLoadingStatus] = useState(true);
 
@@ -46,6 +51,18 @@ const DetailsMembers = ({
     queryKey: ["memberId", memberId],
     queryFn: () => getUserByClerkId(memberId),
   });
+
+  const getMemberRole = (memberCargo: {
+    userId: string;
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    serverId: string;
+    role: Roles;
+  }[]): Roles => {
+    if (!memberCargo || memberCargo.length === 0) return Roles.user;
+    return memberCargo[0].role;
+  };
 
   useEffect(() => {
     if (memberId && userId) {
@@ -81,6 +98,17 @@ const DetailsMembers = ({
     addFriendMutation.mutate();
   };
 
+  const handleRoleChange = async (targetUserId: string, newRole: Roles) => {
+    try {
+      await assignServerRole(currentUserId, targetUserId, serverId, newRole);
+      refetch();
+      toast.success("Novo cago aplicado com sucesso!")
+    } catch (error) {
+      console.error("Failed to change role:", error);
+      toast.error("Erro ao aplicae cargo!")
+    }
+  };
+
   const getStatusButton = () => {
     if (isLoadingStatus) {
       return (
@@ -94,19 +122,19 @@ const DetailsMembers = ({
       case "PENDING":
         return (
           <Button title="Pedido pendente..." disabled className="rounded-full w-8 h-8 bg-yellow-600/60">
-            <UserRoundCog size={16} />
+            <UserRoundCog size={16} className="text-white" />
           </Button>
         );
       case "ACCEPTED":
         return (
-          <Button disabled className="rounded-full w-8 h-8 bg-green-600/60">
-            <Check size={16} />
+          <Button disabled className="rounded-full w-8 h-8 bg-green-600">
+            <Check size={16} className="text-white" />
           </Button>
         );
       case "BLOCKED":
         return (
-          <Button disabled className="rounded-full w-8 h-8 bg-red-600/60">
-            <Ban size={16} />
+          <Button disabled className="rounded-full w-8 h-8 bg-red-600/100">
+            <Ban size={16} className="text-white" />
           </Button>
         );
       default:
@@ -117,7 +145,7 @@ const DetailsMembers = ({
             disabled={addFriendMutation.isPending}
           >
             {addFriendMutation.isPending ? (
-              <Loader size={16} className="animate-spin" />
+              <Loader size={16} className="animate-spin text-white" />
             ) : (
               <UserPlus2Icon size={16} />
             )}
@@ -137,7 +165,7 @@ const DetailsMembers = ({
             </div>
           )}
           {isLoading ? (
-            <div className="flex items-center justify-center h-8 w-full">
+            <div className="flex items-center h-38 justify-center w-full">
               <Loader size={20} className="animate-spin" />
             </div>
           ) : (
@@ -147,7 +175,7 @@ const DetailsMembers = ({
                 <div className="p-2 flex flex-col gap-2.5 relative -top-8 z-40">
                   <div className="h-18 w-18 rounded-full flex items-center justify-between">
                     <Avatar className="h-18 w-18 p-1 rounded-full relative bg-zinc-700">
-                      <AvatarImage src={member?.image ?? "No image user"} alt="User avatar" />
+                      <AvatarImage src={member?.image ?? "No image user"} className="object-cover rounded-full" alt="User avatar" />
                       <AvatarFallback>
                         {member?.username?.charAt(0).toUpperCase()}
                       </AvatarFallback>
@@ -157,8 +185,38 @@ const DetailsMembers = ({
                     </div>
                   </div>
                   <div className="flex flex-col p-2">
-                    <h3 className="font-semibold text-xl">{member?.name}</h3>
-                    <span className="text-sm text-zinc-400">{member?.username}</span>
+                    <div className="flex items-center justify-between w-full">
+                      <div className="">
+                        <div className="flex items-center gap-1.5">
+                          <h3 className="font-semibold text-xl">{member?.name}</h3>
+                          {getRoleIcon(getMemberRole(member?.MemberCargo ?? []), 18)}
+                        </div>
+                        <span className="text-sm text-zinc-400">{member?.username}</span>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <MoreVertical size={16} />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => handleRoleChange(member?.clerk_id!, "admin")}>
+                            <Shield className="mr-2 h-4 w-4" />
+                            Tornar Admin
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleRoleChange(member?.clerk_id!, "moderator")}>
+                            <Shield className="mr-2 h-4 w-4 text-green-500" />
+                            Tornar Moderador
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleRoleChange(member?.clerk_id!, "vip")}>
+                            <Star className="mr-2 h-4 w-4 text-purple-500" />
+                            Tornar VIP
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleRoleChange(member?.clerk_id!, "user")}>
+                            <User2 className="mr-2 h-4 w-4" />
+                            Remover Cargos
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                     {friendshipStatus && (
                       <span className="text-xs mt-1 text-zinc-400">
                         Status: {friendshipStatus === "PENDING" ? "Pedido pendente" :

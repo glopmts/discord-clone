@@ -1,4 +1,5 @@
 import { ChannelTypes, User } from "@prisma/client";
+import { ReactNode } from "react";
 
 export type UserIdProps = {
   userId: string;
@@ -74,3 +75,11 @@ export interface InterfacesRender {
   currentChannelId?: string;
   handleDelete: (categoryId: string, categoryName: string) => void;
 }
+
+export type MenuItem = {
+  label: string;
+  action: () => void;
+  icon?: ReactNode;
+  disabled?: boolean;
+  destructive?: boolean;
+};

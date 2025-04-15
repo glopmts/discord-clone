@@ -20,9 +20,12 @@ type RenderServersProps = {
     createdAt: Date;
     unreadCount: number
   }[]
+  userId: string;
+  type?: string;
   currentServerId: string;
   handleMark: (serverId: string) => void;
   handleExitSever: (serverId: string) => void;
+  handleDeleteSever: (serverId: string) => void;
   handleServerClick: (serverId: string) => void;
   handleConviteServer: (server: { id: string; name: string; inviteCode: string }) => void;
 }
@@ -33,7 +36,9 @@ const RenderSideBarServer = ({
   handleConviteServer,
   handleExitSever,
   handleMark,
-  handleServerClick
+  handleDeleteSever,
+  handleServerClick,
+  userId,
 }: RenderServersProps) => {
   const [contextMenuOpen, setContextMenuOpen] = useState<string | null>(null);
 
@@ -105,7 +110,9 @@ const RenderSideBarServer = ({
                   handleExitSever,
                   handleMark,
                   server,
-                  handleConviteServer: () => handleConviteServer(server)
+                  userId,
+                  handleDeleteSever,
+                  handleConviteServer: () => handleConviteServer(server),
                 }).map((nv) => (
                   <ContextMenuItem
                     key={nv.id}
@@ -115,6 +122,7 @@ const RenderSideBarServer = ({
                     {nv.label}
                   </ContextMenuItem>
                 ))}
+
               </ContextMenuContent>
             </ContextMenu>
           )

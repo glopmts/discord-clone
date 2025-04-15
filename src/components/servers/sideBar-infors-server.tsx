@@ -234,8 +234,9 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
                         })}
                     </div>
 
+                    {/* membros do servidor */}
                     <ScrollArea className="flex-1 w-full h-32 mb-15">
-                      <MemberServer server={server!} />
+                      <MemberServer server={server!} refetch={refetch} />
                     </ScrollArea>
                   </div>
                 </>

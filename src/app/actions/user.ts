@@ -53,6 +53,9 @@ export async function getUserByClerkId(clerkId: string) {
       where: {
         clerk_id: clerkId,
       },
+      include: {
+        MemberCargo: true,
+      }
     })
   } catch (error) {
     console.error("Erro ao buscar usuário por Clerk ID:", error)
@@ -186,3 +189,119 @@ export async function checkFriendshipStatus(addresseeId: string, requesterId: st
     return null;
   }
 }
+
+
+export async function getFriends(userId: string) {
+  try {
+    if (!userId) {
+      throw new Error("User ID is required!");
+    }
+
+    const friends = await db.friendship.findMany({
+      where: {
+        OR: [
+          { requesterId: userId, status: "ACCEPTED" },
+          { addresseeId: userId, status: "ACCEPTED" }
+        ]
+      },
+      include: {
+        addressee: true,
+        requester: true
+      }
+    });
+
+    return friends.map(friendship => {
+      const friend = friendship.requesterId === userId ? friendship.addressee : friendship.requester;
+      return {
+        ...friendship,
+        friend
+      };
+    });
+
+  } catch (error) {
+    console.error("Error getting friends:", error);
+    return null;
+  }
+}
+
+export async function canceleFriends(userId: string, addresseeId: string) {
+  try {
+    if (!userId) {
+      throw new Error("User ID is required!");
+    }
+
+    const cancele = await db.friendship.deleteMany({
+      where: {
+        OR: [
+          { requesterId: userId, addresseeId, status: "PENDING" },
+          { requesterId: addresseeId, addresseeId: userId, status: "PENDING" }
+        ]
+      }
+    });
+
+    return cancele;
+
+  } catch (error) {
+    console.error("Error canceling friend request:", error);
+    return null;
+  }
+}
+
+
+export async function getPendingFriendRequests(userId: string) {
+  try {
+    if (!userId) {
+      throw new Error("User ID is required!");
+    }
+
+    const pendingRequests = await db.friendship.findMany({
+      where: {
+        OR: [
+          { requesterId: userId, status: "PENDING" },
+          { addresseeId: userId, status: "PENDING" }
+        ]
+      },
+      include: {
+        addressee: true,
+        requester: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    return pendingRequests;
+
+  } catch (error) {
+    console.error("Error getting pending friend requests:", error);
+    return null;
+  }
+}
+
+export async function acceptFriends(userId: string, addressee: string) {
+  try {
+
+    if (!userId) {
+      throw new Error("User ID is required!");
+    }
+
+    const acceptRequests = await db.friendship.updateMany({
+      where: {
+        OR: [
+          { requesterId: userId },
+          { addresseeId: userId }
+        ]
+      },
+      data: {
+        status: "ACCEPTED"
+      }
+    });
+
+    return acceptRequests;
+
+  } catch (error) {
+    console.error("Error getting pending friend requests:", error);
+    return null;
+  }
+}
+

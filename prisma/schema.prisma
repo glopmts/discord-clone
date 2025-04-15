@@ -16,7 +16,7 @@ model User {
   email           String?         @unique
   password        String?
   description     String?
-  isOnline        String?
+  isOnline        Boolean         @default(false)
   dateNce         DateTime?
   admin           Roles           @default(user)
   channels        ChannelMember[]
@@ -27,21 +27,23 @@ model User {
   Message         Message[]
   MessageRead     MessageRead[]
 
-  sentFriendRequests     Friendship[] @relation("Requesters")
-  receivedFriendRequests Friendship[] @relation("Addressees")
+  sentFriendRequests     Friendship[]  @relation("Requesters")
+  receivedFriendRequests Friendship[]  @relation("Addressees")
+  MemberCargo            MemberCargo[]
 }
 
 model Server {
-  id         String          @id @default(cuid())
-  name       String
-  ownerId    String
-  image      String?
-  owner      User            @relation(fields: [ownerId], references: [clerk_id])
-  channels   Channel[]
-  members    ChannelMember[]
-  inviteCode String          @unique @default(uuid())
-  createdAt  DateTime        @default(now())
-  Category   Category[]
+  id          String          @id @default(cuid())
+  name        String
+  ownerId     String
+  image       String?
+  owner       User            @relation(fields: [ownerId], references: [clerk_id])
+  channels    Channel[]
+  members     ChannelMember[]
+  inviteCode  String          @unique @default(uuid())
+  createdAt   DateTime        @default(now())
+  Category    Category[]
+  MemberCargo MemberCargo[]
 }
 
 model Channel {
@@ -75,6 +77,19 @@ model ChannelMember {
   user     User     @relation(fields: [userId], references: [clerk_id])
   server   Server   @relation(fields: [serverId], references: [id])
   joinedAt DateTime @default(now())
+
+  @@unique([userId, serverId])
+}
+
+model MemberCargo {
+  id        String   @id @default(cuid())
+  userId    String
+  serverId  String
+  role      Roles    @default(user)
+  user      User     @relation(fields: [userId], references: [clerk_id])
+  server    Server   @relation(fields: [serverId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, serverId])
 }
@@ -129,7 +144,10 @@ model Bot {
 }
 
 enum Roles {
+  owner
   admin
+  moderator
+  vip
   user
 }
 

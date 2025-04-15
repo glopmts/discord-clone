@@ -1,7 +1,7 @@
 "use client";
 
 import { markAllMessagesAsRead } from "@/app/actions/menssagens";
-import { getUserServersWithUnreadCount } from "@/app/actions/servers";
+import { exitServer, getUserServersWithUnreadCount } from "@/app/actions/servers";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -12,6 +12,7 @@ import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import LoadingScreen from "../loadingScree";
 import ConviteUserServer from "../modals/convite-users-server";
 import ModalCreateServer from "../modals/modal-news-servers";
 import RenderSideBarServer from "./sider-bar-server-render";
@@ -65,9 +66,33 @@ const SideBarServers = ({ userId }: UserIdProps) => {
   }
 
 
-  const handleExitSever = () => {
+  const handleExitSever = async (serverId: string) => {
+    const confirmExit = window.confirm("Tem certeza que deseja sair deste servidor?");
+    if (!confirmExit) return;
 
+    try {
+      await exitServer(userId, serverId);
+      toast.success("Saiu do servidor com sucesso!");
+    } catch (error) {
+      console.log(error);
+      toast.error("Erro ao sair do servidor");
+    }
   }
+
+
+  const handleDeleSever = async (serverId: string) => {
+    const confirmExit = window.confirm("Tem certeza que deseja DELETAR esté servidor?");
+    if (!confirmExit) return;
+
+    try {
+      await exitServer(userId, serverId);
+      toast.success("Servidor deletado com sucesso!");
+    } catch (error) {
+      console.log(error);
+      toast.error("Erro ao deletar o servidor");
+    }
+  }
+
 
   const handleConviteServer = (server: {
     id: string;
@@ -86,6 +111,10 @@ const SideBarServers = ({ userId }: UserIdProps) => {
     } catch (error) {
       toast.error("Erro ao marcar mensagens:");
     }
+  }
+
+  if (isLoading) {
+    <LoadingScreen />
   }
 
   return (
@@ -122,7 +151,9 @@ const SideBarServers = ({ userId }: UserIdProps) => {
               handleExitSever={handleExitSever}
               handleMark={handleMark}
               handleServerClick={handleServerClick}
+              handleDeleteSever={handleDeleSever}
               servers={servers!}
+              userId={userId}
             />
           </div>
           <div className="mt-2 flex flex-col items-center space-y-2 pb-2">

@@ -20,6 +20,11 @@ export async function getUserServersWithUnreadCount(userId: string) {
           select: { id: true }
         },
         members: true,
+        MemberCargo: true,
+        Category: true,
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
     });
 
@@ -74,9 +79,14 @@ export async function geServer(id: string) {
         },
         members: {
           include: {
-            user: true,
+            user: {
+              include: {
+                MemberCargo: true
+              }
+            },
           }
         },
+        MemberCargo: true,
       }
     })
 
@@ -175,6 +185,103 @@ export async function joinServer(userId: string, serverId: string) {
     return { success: true };
   } catch (error) {
     console.error("Failed to join server:", error);
+    return { success: false, message: error instanceof Error ? error.message : "Unknown error" };
+  }
+}
+
+
+export async function exitServer(userId: string, serverId: string) {
+  try {
+    if (!userId || !serverId) throw new Error("Missing userId or serverId");
+
+    const verifqServer = await db.server.findUnique({
+      where: {
+        id: serverId
+      }
+    })
+
+    if (!verifqServer) {
+      throw new Error("Server does not exist!")
+    }
+
+    await db.channelMember.delete({
+      where: {
+        userId_serverId: {
+          userId: userId,
+          serverId: serverId
+        }
+      }
+    })
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to exit server:", error);
+    return { success: false, message: error instanceof Error ? error.message : "Unknown error" };
+  }
+}
+
+
+export async function deleteServer(userId: string, serverId: string) {
+  try {
+    if (!userId || !serverId) throw new Error("Missing userId or serverId");
+
+    const server = await db.server.findUnique({
+      where: {
+        id: serverId
+      },
+      include: {
+        Category: {
+          include: {
+            channels: true
+          }
+        },
+        channels: true,
+        members: true,
+      }
+    });
+
+    if (!server) {
+      throw new Error("Server does not exist!");
+    }
+
+    if (server.ownerId !== userId) {
+      throw new Error("You are not authorized to delete this server!");
+    }
+
+    // Delete all associated data
+    await db.$transaction([
+      db.message.deleteMany({
+        where: {
+          channelId: {
+            in: server.channels.map(channel => channel.id)
+          }
+        }
+      }),
+      db.channelMember.deleteMany({
+        where: {
+          serverId: serverId
+        }
+      }),
+      db.channel.deleteMany({
+        where: {
+          serverId: serverId
+        }
+      }),
+      db.category.deleteMany({
+        where: {
+          serverId: serverId
+        }
+      }),
+      db.server.delete({
+        where: {
+          id: serverId
+        }
+      })
+    ]);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete server:", error);
     return { success: false, message: error instanceof Error ? error.message : "Unknown error" };
   }
 }
