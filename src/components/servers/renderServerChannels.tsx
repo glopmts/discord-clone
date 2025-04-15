@@ -1,4 +1,4 @@
-import { channelIcons } from "@/types/iconsChannels"
+import { channelIcons } from "@/components/iconsChannels"
 import { InterfacesRender } from "@/types/interfaces"
 import { Calendar, LucideListMinus, Plus, Users } from "lucide-react"
 import { useEffect, useState } from "react"

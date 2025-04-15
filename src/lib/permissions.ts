@@ -1,4 +1,5 @@
 import { getServerRole } from "@/app/actions/member-servers";
+import { ServerProps } from "@/types/interfaces";
 import { Roles } from "@prisma/client";
 
 export const hasPermission = async (
@@ -18,5 +19,31 @@ export const hasPermission = async (
   return roleHierarchy[userRole] >= roleHierarchy[requiredRole];
 };
 
-// Exemplo de uso:
-// const canManageRoles = await hasPermission(currentUserId, serverId, "admin");
+export const isServerOwner = (userId: string, server: ServerProps): boolean => {
+  return server.ownerId === userId;
+};
+
+export const hasServerRole = (
+  userId: string,
+  server: ServerProps,
+  roles: Roles[]
+): boolean => {
+  return server.MemberCargo.some(
+    (member) => member.userId === userId && roles.includes(member.role)
+  );
+};
+
+export const canDeletePermission = (
+  userId: string,
+  validate: any,
+  server: ServerProps
+): boolean => {
+
+  if (validate.userId === userId) return true;
+
+  if (isServerOwner(userId, server)) return true;
+
+  if (hasServerRole(userId, server, ['admin', 'moderator'])) return true;
+
+  return false;
+};

@@ -1,34 +1,16 @@
 import { getRoleIcon } from "@/components/IconsCargosMembers";
+import { canDeletePermission } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
-import { MenuItem } from "@/types/interfaces";
-import { Roles, User } from "@prisma/client";
-import { Ban, MessageSquare, MoreVertical, Shield, User as UserIcon } from "lucide-react";
+import { MenuItem, ServerPropsMember } from "@/types/interfaces";
+import { Roles } from "@prisma/client";
+import { Ban, MessageSquare, MoreVertical, User as UserIcon } from "lucide-react";
 import { useState } from "react";
 import ContextMenuGlobe from "../ContextMenu";
 import DetailsMembers from "../modals/details-members-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
-type ServerProps = {
-  server: {
-    id: string;
-    members: {
-      id: string;
-      user: User & {
-        MemberCargo: {
-          userId: string;
-          id: string;
-          createdAt: Date;
-          updatedAt: Date;
-          serverId: string;
-          role: Roles;
-        }[];
-      };
-    }[];
-  };
-  refetch: () => void;
-}
 
-const MemberServer = ({ server, refetch }: ServerProps) => {
+const MemberServer = ({ server, currentUserId, handleExpulseMember }: ServerPropsMember) => {
   const [isOpen, setOpen] = useState(false);
   const [selectMember, setSelectMember] = useState<string | null>(null);
   const [contextMenuOpen, setContextMenuOpen] = useState<string | null>(null);
@@ -49,7 +31,7 @@ const MemberServer = ({ server, refetch }: ServerProps) => {
     return cargo ? cargo.role : Roles.user;
   };
 
-  const getMemberContextMenuItems = (memberId: string, isAdmin: boolean): MenuItem[] => {
+  const getMemberContextMenuItems = (memberId: string, showDeleteOption: boolean): MenuItem[] => {
     const memberRole = getMemberRole(memberId);
 
     return [
@@ -63,22 +45,13 @@ const MemberServer = ({ server, refetch }: ServerProps) => {
         action: () => console.log(`Mensagem para ${memberId}`),
         icon: <MessageSquare size={16} />,
       },
-      {
-        label: isAdmin ? "Remover admin" : "Tornar admin",
-        action: () => {
-          console.log(`Alterar status admin para ${memberId}`);
-          refetch();
-        },
-        icon: <Shield size={16} />,
-        disabled: memberRole === "owner",
-      },
-      {
+      ...(showDeleteOption ? [{
         label: "Expulsar do servidor",
-        action: () => console.log(`Expulsar ${memberId}`),
+        action: () => handleExpulseMember(memberId),
         icon: <Ban size={16} />,
         destructive: true,
         disabled: memberRole === "owner",
-      },
+      }] : []),
     ];
   };
 
@@ -94,13 +67,14 @@ const MemberServer = ({ server, refetch }: ServerProps) => {
           <div className="mt-2">
             {server.members.map((member) => {
               const memberRole = getMemberRole(member.id);
+              const canDelete = canDeletePermission(currentUserId, member, server as any);
 
               return (
                 <ContextMenuGlobe
-                  key={contextMenuOpen} // isso faz que a tela não congele ao abrir o modal!
+                  key={contextMenuOpen}
                   menuItems={getMemberContextMenuItems(
                     member.id,
-                    memberRole === "admin" || memberRole === "owner"
+                    canDelete
                   )}
                   onOpenChange={(open) => {
                     setContextMenuOpen(open ? member.id : null);
@@ -117,7 +91,7 @@ const MemberServer = ({ server, refetch }: ServerProps) => {
                       </AvatarFallback>
                     </Avatar>
                     <div className="ml-3">
-                      <p className="text-sm text-white">{member.user?.name || "Usuário"}</p>
+                      <p className="text-sm text-white truncate line-clamp-1">{member.user?.name || "Usuário"}</p>
                       <div className="flex items-center gap-1 text-xs mt-1 text-neutral-400">
                         {getRoleIcon(memberRole, 14)}
                         <span className="capitalize">{memberRole}</span>

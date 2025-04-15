@@ -156,7 +156,7 @@ const DetailsMembers = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={cn("p-0 overflow-hidden bg-zinc-800 w-[400px]")}>
+      <DialogContent className={cn("p-0 overflow-hidden z-[200] bg-zinc-800 w-[400px]")}>
         <DialogTitle className="hidden"></DialogTitle>
         <div className="w-full">
           {error && (
@@ -197,20 +197,20 @@ const DetailsMembers = ({
                         <DropdownMenuTrigger>
                           <MoreVertical size={16} />
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => handleRoleChange(member?.clerk_id!, "admin")}>
+                        <DropdownMenuContent className={cn("z-[220]")}>
+                          <DropdownMenuItem className="cursor-pointer hover:opacity-70" onClick={() => handleRoleChange(member?.clerk_id!, "admin")}>
                             <Shield className="mr-2 h-4 w-4" />
                             Tornar Admin
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleRoleChange(member?.clerk_id!, "moderator")}>
+                          <DropdownMenuItem className="cursor-pointer hover:opacity-70" onClick={() => handleRoleChange(member?.clerk_id!, "moderator")}>
                             <Shield className="mr-2 h-4 w-4 text-green-500" />
                             Tornar Moderador
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleRoleChange(member?.clerk_id!, "vip")}>
+                          <DropdownMenuItem className="cursor-pointer hover:opacity-70" onClick={() => handleRoleChange(member?.clerk_id!, "vip")}>
                             <Star className="mr-2 h-4 w-4 text-purple-500" />
                             Tornar VIP
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleRoleChange(member?.clerk_id!, "user")}>
+                          <DropdownMenuItem className="cursor-pointer hover:opacity-70" onClick={() => handleRoleChange(member?.clerk_id!, "user")}>
                             <User2 className="mr-2 h-4 w-4" />
                             Remover Cargos
                           </DropdownMenuItem>

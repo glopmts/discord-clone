@@ -1,6 +1,7 @@
 "use client";
 
 import { getChannelId } from "@/app/actions/channels";
+import { expelsMember } from "@/app/actions/member-servers";
 import { deleteMessage } from "@/app/actions/menssagens";
 import { geServer } from "@/app/actions/servers";
 import MemberServer from "@/components/infor-bar/member-server";
@@ -20,8 +21,11 @@ import { toast } from "sonner";
 
 const Channels = () => {
   const { userId } = useAuth();
+
   const searchParams = useSearchParams();
   const id = searchParams.get("chaId");
+  const serverId = searchParams.get("id");
+
   const [messageInput, setMessageInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -33,18 +37,17 @@ const Channels = () => {
     data: channel,
     isLoading,
     error,
-    refetch,
+    refetch: refreshChannel
   } = useQuery({
     queryKey: ["channelId", id],
     queryFn: () => getChannelId(id!),
     staleTime: 0
   });
 
-  const serverId = channel?.serverId;
-
   const {
     data: server,
-    isLoading: loaderServer
+    isLoading: loaderServer,
+    refetch
   } = useQuery({
     queryKey: ["server", serverId],
     queryFn: () => geServer(serverId!),
@@ -54,9 +57,16 @@ const Channels = () => {
     if (!id) return;
 
     const eventSource = new EventSource(`/api/sse?channelId=${id}`);
+
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      setRealTimeMessages((prev) => [...prev, data]);
+
+      if (data.type === 'new_message') {
+        setRealTimeMessages(prev => [...prev, data.message]);
+      }
+      else if (data.type === 'deleted_message') {
+        setRealTimeMessages(prev => prev.filter(msg => msg.id !== data.messageId));
+      }
     };
 
     return () => {
@@ -98,7 +108,7 @@ const Channels = () => {
       },
     });
 
-    refetch();
+    await refreshChannel();
     setMessageInput("");
   };
 
@@ -110,7 +120,8 @@ const Channels = () => {
   const handleDeleteMessage = async (messageId: string) => {
     try {
       await deleteMessage(userId!, messageId);
-      await refetch();
+      setRealTimeMessages(prev => prev.filter(msg => msg.id !== messageId));
+      await refreshChannel();
     } catch (error) {
       console.error("Erro ao deletar mensagem:", error);
       toast.error(error instanceof Error ? error.message : "Erro ao deletar mensagem!");
@@ -119,6 +130,23 @@ const Channels = () => {
 
   const handleListMembers = () => {
     setListMembers(prev => !prev)
+  }
+
+  const handleExpulseMember = async (memberId: string) => {
+    const confirmExit = window.confirm("Deseja continuar com esta ação?");
+    if (!confirmExit) return;
+
+    try {
+      const result = await expelsMember(userId!, memberId, serverId!)
+      if (result.success) {
+        toast.success(result.message);
+        refreshChannel();
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      toast.error("Erro ao expulsar membro" + error)
+    }
   }
 
   const groupedMessages = allMessages.reduce((acc, message) => {
@@ -225,6 +253,8 @@ const Channels = () => {
                           allMessages={messages as any}
                           messagesEndRef={messagesEndRef}
                           handleDeleteMessage={handleDeleteMessage}
+                          currentUserId={userId!}
+                          server={server!}
                         />
                       </div>
                     ))}
@@ -275,7 +305,11 @@ const Channels = () => {
                     <Loader size={28} className="animate-spin text-[#949ba4]" />
                   </div>
                 ) : (
-                  <MemberServer server={server!} refetch={refetch} />
+                  <MemberServer
+                    server={server!}
+                    currentUserId={userId!}
+                    handleExpulseMember={handleExpulseMember}
+                  />
                 )}
               </ScrollArea>
             </div>

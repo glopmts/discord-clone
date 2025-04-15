@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { canDeletePermission } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { MessagePropsRender } from "@/types/interfaces";
 import { formatFullDateTime, formatTimeOnly, isFirstMessageOfDay } from "@/utils/formatDate";
@@ -34,7 +35,9 @@ const emojis = [
 const RenderMessagens: FC<MessagePropsRender> = ({
   allMessages,
   messagesEndRef,
-  handleDeleteMessage
+  handleDeleteMessage,
+  currentUserId,
+  server
 }) => {
   const [hoveredMessage, setHoveredMessage] = useState<string | null>(null);
   const [dropdownOpenForMessage, setDropdownOpenForMessage] = useState<string | null>(null);
@@ -56,6 +59,7 @@ const RenderMessagens: FC<MessagePropsRender> = ({
           const timeText = isFirstOfDay
             ? formatFullDateTime(new Date(msg.createdAt))
             : formatTimeOnly(new Date(msg.createdAt))
+          const canDelete = canDeletePermission(currentUserId, msg, server);
 
           return (
             <div
@@ -120,6 +124,7 @@ const RenderMessagens: FC<MessagePropsRender> = ({
                           }}
                           handleDeleteMessage={handleDeleteMessage}
                           handleCopyMessage={() => handleCopyMessage(msg.content)}
+                          showDeleteOption={canDelete}
                         />
                       </div>
                     </div>
@@ -148,6 +153,7 @@ interface MenuOptionsProps {
   setDropdownOpen: (open: boolean) => void;
   handleDeleteMessage: (messageId: string) => void;
   handleCopyMessage: (text: string) => void;
+  showDeleteOption: boolean;
 }
 
 const MenuOptions: FC<MenuOptionsProps> = ({
@@ -155,7 +161,8 @@ const MenuOptions: FC<MenuOptionsProps> = ({
   dropdownOpen,
   setDropdownOpen,
   handleDeleteMessage,
-  handleCopyMessage
+  handleCopyMessage,
+  showDeleteOption
 }) => {
 
   const menuOptions = [
@@ -165,19 +172,19 @@ const MenuOptions: FC<MenuOptionsProps> = ({
       icon: Copy,
       onchage: handleCopyMessage
     },
-    {
+    ...(showDeleteOption ? [{
       id: 2,
       label: "Editar menssagem",
       icon: Pen,
       onchage: () => { }
-    },
-    {
+    }] : []),
+    ...(showDeleteOption ? [{
       id: 1,
-      label: "Excluir menssagem",
+      label: "Excluir mensagem",
       type: "delete",
       icon: Trash2,
       onchage: handleDeleteMessage
-    }
+    }] : [])
   ]
 
 

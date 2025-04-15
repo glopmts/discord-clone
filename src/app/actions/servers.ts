@@ -285,3 +285,5 @@ export async function deleteServer(userId: string, serverId: string) {
     return { success: false, message: error instanceof Error ? error.message : "Unknown error" };
   }
 }
+
+

@@ -3,7 +3,7 @@
 import { createNewsCategory, deleteCategoryId } from "@/app/actions/category"
 import { createChannel } from "@/app/actions/channels"
 import { geServer } from "@/app/actions/servers"
-import { channelIcons } from "@/types/iconsChannels"
+import { channelIcons } from "@/components/iconsChannels"
 import { UserIdProps } from "@/types/interfaces"
 import { ChannelTypes } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"

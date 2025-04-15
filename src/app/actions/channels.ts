@@ -30,6 +30,8 @@ export async function createChannel(data: {
     throw new Error("Failed create channel")
   }
 }
+
+
 export async function getChannelId(id: string) {
   try {
     if (!id) {

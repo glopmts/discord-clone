@@ -9,6 +9,11 @@ export const formatFullDateTime = (date: Date) => {
   return format(date, "dd/MM/yyyy, HH:mm", { locale: ptBR })
 }
 
+export const formatDateComplete = (date: Date) => {
+  return format(date, "dd/MM/yyyy", { locale: ptBR })
+}
+
+
 export const formatTimeOnly = (date: Date) => {
   return format(date, "HH:mm", { locale: ptBR })
 }

@@ -106,3 +106,66 @@ export async function updateServerRole(
     throw error;
   }
 }
+
+
+export async function expelsMember(userId: string, memberId: string, serverId: string) {
+  try {
+    if (!userId || !memberId || !serverId) {
+      throw new Error("Missing required parameters");
+    }
+
+    const currentUserRole = await getServerRole(userId, serverId);
+
+    if (currentUserRole !== "owner" && currentUserRole !== "admin") {
+      throw new Error("Sem permissão para expulsar membro");
+    }
+
+    const targetUserRole = await getServerRole(memberId, serverId);
+    if (targetUserRole === "owner") {
+      throw new Error("Não pode expulsar o dono do servidor");
+    }
+
+    if (currentUserRole === "admin" && targetUserRole === "admin") {
+      throw new Error("Admins não podem expulsar outros admins");
+    }
+
+    const result = await db.$transaction([
+      db.channelMember.deleteMany({
+        where: {
+          userId: memberId,
+          serverId: serverId
+        }
+      }),
+
+      db.memberCargo.deleteMany({
+        where: {
+          userId: memberId,
+          serverId: serverId
+        }
+      }),
+
+      db.message.deleteMany({
+        where: {
+          userId: memberId,
+          channel: {
+            serverId: serverId
+          }
+        }
+      })
+    ]);
+
+    return {
+      success: true,
+      message: "Membro expulso com sucesso",
+      data: result
+    };
+
+  } catch (error) {
+    console.error("Failed to expel member:", error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Unknown error"
+    };
+  }
+}
+

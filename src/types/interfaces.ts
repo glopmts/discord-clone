@@ -1,4 +1,4 @@
-import { ChannelTypes, User } from "@prisma/client";
+import { ChannelTypes, Roles, User } from "@prisma/client";
 import { ReactNode } from "react";
 
 export type UserIdProps = {
@@ -15,37 +15,52 @@ export type ModalProps = {
   refetch: () => void;
 }
 
+
+
+export interface UserProps {
+  id: string;
+  clerk_id: string | null;
+  name: string | null;
+  username: string | null;
+  image: string | null;
+  email: string | null;
+  password: string | null;
+  description: string | null;
+  updatedAt: Date;
+}
+
 export interface MessageProps {
   id: string;
   content: string;
   userId: string;
   channelId: string;
-  user: {
-    name: string;
-    username: string;
-    image: string | null;
-  };
-  createdAt: Date | string;
+  image: string | null;
+  createdAt: Date;
+  user: UserProps;
 }
 
+export interface ServerProps {
+  id: string;
+  image: string | null;
+  ownerId: string;
+  name: string;
+  inviteCode: string;
+  createdAt: Date;
+  MemberCargo: {
+    id: string;
+    userId: string;
+    serverId: string;
+    role: Roles;
+  }[];
+}
 
 export type MessagePropsRender = {
-  allMessages: Array<MessageProps & {
-    user: {
-      name: string | null;
-      id: string;
-      clerk_id: string | null;
-      username: string | null;
-      image: string | null;
-      email: string | null;
-      password: string | null;
-      description: string | null;
-      updatedAt: Date;
-    };
-  }>;
+  allMessages: MessageProps[];
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
   handleDeleteMessage: (messageId: string) => void;
-}
+  currentUserId: string;
+  server: ServerProps;
+};
 
 export interface InterfacesRender {
   server: {
@@ -83,4 +98,26 @@ export type MenuItem = {
   icon?: ReactNode;
   disabled?: boolean;
   destructive?: boolean;
+  showDeleteOption?: boolean;
 };
+
+export interface ServerPropsMember {
+  server: {
+    id: string;
+    members: {
+      id: string;
+      user: User & {
+        MemberCargo: {
+          userId: string;
+          id: string;
+          createdAt: Date;
+          updatedAt: Date;
+          serverId: string;
+          role: Roles;
+        }[];
+      };
+    }[];
+  };
+  currentUserId: string;
+  handleExpulseMember: (memberId: string) => void;
+}

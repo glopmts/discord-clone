@@ -30,7 +30,7 @@ const ContextMenuGlobe = ({
   return (
     <ContextMenu onOpenChange={onOpenChange}>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-      <ContextMenuContent className="w-64" onInteractOutside={() => onOpenChange?.(false)}>
+      <ContextMenuContent className="w-64 z-[200]" onInteractOutside={() => onOpenChange?.(false)}>
         {menuItems.map((item, index) => (
           <ContextMenuItem
             key={index}

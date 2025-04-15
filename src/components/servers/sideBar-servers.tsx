@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import LoadingScreen from "../loadingScree";
 import ConviteUserServer from "../modals/convite-users-server";
 import ModalCreateServer from "../modals/modal-news-servers";
-import RenderSideBarServer from "./sider-bar-server-render";
+import RenderSideBarServer from "./sideBar-Servers-Render";
 
 const SideBarServers = ({ userId }: UserIdProps) => {
   const router = useRouter()
