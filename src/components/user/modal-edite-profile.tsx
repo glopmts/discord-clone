@@ -33,7 +33,7 @@ export function AlertEditeProfile({ isOpen, onClose, user, userId, refetch }: Mo
     name: user?.name || "",
     username: user?.username || "",
     image: user?.image || "",
-    description: ""
+    description: user?.description || ""
   });
 
 
@@ -97,10 +97,11 @@ export function AlertEditeProfile({ isOpen, onClose, user, userId, refetch }: Mo
           </div>
           <div className="flex flex-col gap-2.5">
             <Label>Descrição</Label>
-            <Input
+            <textarea
               placeholder="Descrição"
-              type="text"
               value={form.description}
+              className="flex min-h-[80px] w-full rounded-md border border-input bg-zinc-800 px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              maxLength={300}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
             />
           </div>

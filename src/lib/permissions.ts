@@ -1,6 +1,6 @@
 import { getServerRole } from "@/app/actions/member-servers";
-import { ServerProps } from "@/types/interfaces";
-import { Roles } from "@prisma/client";
+import { ServerProps, UnifiedMessage } from "@/types/interfaces";
+import { Roles, Server } from "@prisma/client";
 
 export const hasPermission = async (
   userId: string,
@@ -34,16 +34,21 @@ export const hasServerRole = (
 };
 
 export const canDeletePermission = (
-  userId: string,
-  validate: any,
-  server: ServerProps
-): boolean => {
+  currentUserId: string,
+  message: UnifiedMessage,
+  server?: Server | null
+) => {
+  const isAuthor =
+    message.user.clerk_id === currentUserId ||
+    message.userId === currentUserId ||
+    (message.sendUser && message.sendUser.clerk_id === currentUserId);
 
-  if (validate.userId === userId) return true;
+  if (!server) {
+    return isAuthor;
+  }
 
-  if (isServerOwner(userId, server)) return true;
+  const isServerOwner = server.ownerId === currentUserId;
+  const isServerAdmin = false;
 
-  if (hasServerRole(userId, server, ['admin', 'moderator'])) return true;
-
-  return false;
+  return isAuthor || isServerOwner || isServerAdmin;
 };

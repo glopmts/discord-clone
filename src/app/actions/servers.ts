@@ -287,3 +287,20 @@ export async function deleteServer(userId: string, serverId: string) {
 }
 
 
+export const getServersByUserId = async (userId: string) => {
+  try {
+    const servers = await db.channelMember.findMany({
+      where: {
+        userId: userId
+      },
+      include: {
+        server: true
+      }
+    });
+
+    return servers.map(member => member.server);
+  } catch (error) {
+    console.error("Error fetching user servers:", error);
+    return [];
+  }
+};

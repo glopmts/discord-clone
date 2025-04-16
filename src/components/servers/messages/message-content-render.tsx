@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { canDeletePermission } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
-import { MessagePropsRender } from "@/types/interfaces";
+import { MessagePropsRender, UnifiedMessage } from "@/types/interfaces";
 import { formatFullDateTime, formatTimeOnly, isFirstMessageOfDay } from "@/utils/formatDate";
 import { Copy, CornerUpRight, EllipsisIcon, Laugh, Pen, Trash2 } from "lucide-react";
 import { FC, useState } from "react";
@@ -31,7 +31,6 @@ const emojis = [
   }
 ]
 
-
 const RenderMessagens: FC<MessagePropsRender> = ({
   allMessages,
   messagesEndRef,
@@ -50,44 +49,79 @@ const RenderMessagens: FC<MessagePropsRender> = ({
     navigator.clipboard.writeText(text)
   }
 
+  const normalizeMessage = (msg: any): UnifiedMessage => {
+    if (msg.sendUser) {
+      return {
+        id: msg.id,
+        content: msg.content,
+        createdAt: new Date(msg.createdAt),
+        user: {
+          id: msg.sendUser.id,
+          clerk_id: msg.sendUser.clerk_id,
+          name: msg.sendUser.name,
+          username: msg.sendUser.username,
+          image: msg.sendUser.image
+        },
+        sendUser: msg.sendUser,
+        receivesFriends: msg.receivesFriends
+      };
+    } else {
+      return {
+        id: msg.id,
+        content: msg.content,
+        createdAt: new Date(msg.createdAt),
+        user: {
+          id: msg.user.id,
+          name: msg.user.name,
+          username: msg.user.username,
+          image: msg.user.image
+        },
+        userId: msg.userId
+      };
+    }
+  };
+
   return (
     <div className="mt-4 flex flex-col gap-4">
       {allMessages.length > 0 ? (
         allMessages.map((msg, index) => {
-          const userColor = getUserColor(msg.userId || msg.user.name || "");
-          const isFirstOfDay = isFirstMessageOfDay(allMessages, index)
+          const normalizedMsg = normalizeMessage(msg);
+          const userColor = getUserColor(normalizedMsg.user.id || normalizedMsg.user.clerk_id || normalizedMsg.user.name || "");
+
+          const isFirstOfDay = isFirstMessageOfDay(allMessages, index);
           const timeText = isFirstOfDay
-            ? formatFullDateTime(new Date(msg.createdAt))
-            : formatTimeOnly(new Date(msg.createdAt))
-          const canDelete = canDeletePermission(currentUserId, msg, server);
+            ? formatFullDateTime(new Date(normalizedMsg.createdAt))
+            : formatTimeOnly(new Date(normalizedMsg.createdAt));
+
+          const canDelete = canDeletePermission(currentUserId, normalizedMsg, server);
 
           return (
             <div
               className="flex items-start gap-2 relative group"
-              key={msg.id}
-              onMouseEnter={() => setHoveredMessage(msg.id)}
+              key={normalizedMsg.id}
+              onMouseEnter={() => setHoveredMessage(normalizedMsg.id)}
               onMouseLeave={() => {
-                if (dropdownOpenForMessage !== msg.id) {
+                if (dropdownOpenForMessage !== normalizedMsg.id) {
                   setHoveredMessage(null);
                 }
               }}
             >
               <Avatar className={cn("w-10 h-10")}>
-                <AvatarImage src={msg.user.image || undefined} />
+                <AvatarImage src={normalizedMsg.user.image || undefined} />
                 <AvatarFallback>
-                  {msg.user.username?.charAt(0).toUpperCase()}
+                  {normalizedMsg.user.username?.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <span className={`font-semibold text-base ${userColor}`}>
-                    {msg.user.name}
+                    {normalizedMsg.user.name}
                   </span>
                   <span className="text-xs text-zinc-500">
                     {timeText}
                   </span>
                 </div>
-                <p className="text-zinc-300">{msg.content}</p>
+                <p className="text-zinc-300">{normalizedMsg.content}</p>
 
                 {/* Menu que aparece ao passar o mouse */}
                 {(hoveredMessage === msg.id || dropdownOpenForMessage === msg.id) && (

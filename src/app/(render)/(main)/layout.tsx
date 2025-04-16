@@ -1,9 +1,9 @@
 "use client"
 
 import Header from "@/components/header"
-import ProfileHeader from "@/components/profile-header"
 import SiderBarInfors from "@/components/servers/sideBar-infors-server"
 import SideBarServes from "@/components/servers/sideBar-servers"
+import ProfileHeader from "@/components/user/profile-header"
 import { useAuth } from "@clerk/nextjs"
 import type React from "react"
 

@@ -59,7 +59,7 @@ export type MessagePropsRender = {
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
   handleDeleteMessage: (messageId: string) => void;
   currentUserId: string;
-  server: ServerProps;
+  server?: ServerProps;
 };
 
 export interface InterfacesRender {
@@ -121,3 +121,19 @@ export interface ServerPropsMember {
   currentUserId: string;
   handleExpulseMember: (memberId: string) => void;
 }
+
+export type UnifiedMessage = {
+  id: string;
+  content: string;
+  createdAt: Date;
+  user: {
+    id?: string;
+    clerk_id?: string;
+    name: string;
+    username?: string;
+    image?: string | null;
+  };
+  userId?: string;
+  sendUser?: any;
+  receivesFriends?: any;
+};

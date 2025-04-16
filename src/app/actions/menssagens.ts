@@ -70,3 +70,34 @@ export async function deleteMessage(userId: string, messageId: string) {
     throw new Error("Falha ao deletar mensagem");
   }
 }
+
+export async function getMessagesFriends(userId: string, receivesId: string) {
+  try {
+    if (!receivesId || !userId) {
+      throw new Error("Receives ID e User ID são obrigatórios.");
+    }
+
+    const messages = await db.messageFriends.findMany({
+      where: {
+        OR: [
+          { sendId: userId, receivesFriends: { clerk_id: receivesId } },
+          { sendId: receivesId, receivesFriends: { clerk_id: userId } }
+        ]
+      },
+      include: {
+        receivesFriends: true,
+        sendUser: true,
+      },
+      orderBy: {
+        createdAt: "asc"
+      }
+    });
+
+    return messages;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to get messages between friends: ${error.message}`);
+    }
+    throw new Error("Failed to get messages between friends");
+  }
+}

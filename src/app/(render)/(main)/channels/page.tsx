@@ -5,16 +5,16 @@ import { expelsMember } from "@/app/actions/member-servers";
 import { deleteMessage } from "@/app/actions/menssagens";
 import { geServer } from "@/app/actions/servers";
 import MemberServer from "@/components/infor-bar/member-server";
+import InputMenssagens from "@/components/servers/messages/input-menssagens";
 import RenderMessagens from "@/components/servers/messages/message-content-render";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
 import { MessageProps } from "@/types/interfaces";
 import { formatMessageDate } from "@/utils/formatDate";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Dot, Gift, Hash, Laugh, Loader, Pin, PlusCircle, Search, Sticker, Users } from "lucide-react";
+import { Bell, Dot, Hash, Loader, Pin, Search, Users } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -264,36 +264,13 @@ const Channels = () => {
             </div>
 
             {/* Área de input de mensagem */}
-            <div className="p-2 bottom-1 absolute w-full">
-              <div className="bg-[#222327] border rounded-lg">
-                <div className="flex items-center justify-between bg-[#222327] p-1.5 px-4 rounded-md">
-                  <div className="flex items-center w-full">
-                    <div className="mr-4 text-zinc-400 hover:text-zinc-200 cursor-pointer">
-                      <PlusCircle size={20} />
-                    </div>
-                    <Input
-                      placeholder={`Conversar em # 💬 ${channel?.name}`}
-                      className={cn("border-0 w-full dark:bg-input/0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0")}
-                      value={messageInput}
-                      onChange={(e) => setMessageInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                      minLength={3}
-                      multiple
-                    />
-                  </div>
-                  <div className="ml-4 text-zinc-400 flex items-center gap-3">
-                    <Gift size={20} className="hover:text-zinc-200 cursor-pointer" />
-                    <Sticker size={20} className="hover:text-zinc-200 cursor-pointer" />
-                    <Laugh size={20} className="hover:text-zinc-200 cursor-pointer" />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <InputMenssagens
+              type="absolute"
+              name={channel?.name}
+              messageInput={messageInput}
+              handleSendMessage={handleSendMessage}
+              setMessageInput={setMessageInput}
+            />
           </div>
 
           {/* Lista de membros */}

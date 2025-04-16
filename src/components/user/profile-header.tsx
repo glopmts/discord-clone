@@ -5,11 +5,11 @@ import { UserIdProps } from "@/types/interfaces"
 import { useQuery } from "@tanstack/react-query"
 import { HeadphoneOff, HeadphonesIcon, Loader, Mic, MicOffIcon, Settings } from "lucide-react"
 import { useState } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { Button } from "./ui/button"
-import ModalUserDetails from "./user/details-user-modal"
-import InterfacePageConfigs from "./user/details-user-page"
-import { AlertEditeProfile } from "./user/modal-edite-profile"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { Button } from "../ui/button"
+import ModalUserDetails from "./details-user-modal"
+import InterfacePageConfigs from "./details-user-page"
+import { AlertEditeProfile } from "./modal-edite-profile"
 
 const ProfileHeader = ({ userId }: UserIdProps) => {
 

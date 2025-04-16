@@ -27,9 +27,11 @@ model User {
   Message         Message[]
   MessageRead     MessageRead[]
 
-  sentFriendRequests     Friendship[]  @relation("Requesters")
-  receivedFriendRequests Friendship[]  @relation("Addressees")
+  sentFriendRequests     Friendship[]     @relation("Requesters")
+  receivedFriendRequests Friendship[]     @relation("Addressees")
   MemberCargo            MemberCargo[]
+  sendFriends            MessageFriends[] @relation("Send")
+  MessageFriends         MessageFriends[] @relation("Receives")
 }
 
 model Server {
@@ -106,13 +108,28 @@ model Message {
   MessageRead MessageRead[]
 }
 
+model MessageFriends {
+  id              String  @id @default(cuid())
+  content         String
+  sendId          String
+  receivesId      String
+  image           String?
+  sendUser        User    @relation("Send", fields: [sendId], references: [clerk_id])
+  receivesFriends User    @relation("Receives", fields: [receivesId], references: [clerk_id])
+
+  createdAt   DateTime      @default(now())
+  MessageRead MessageRead[]
+}
+
 model MessageRead {
-  id        String   @id @default(cuid())
-  userId    String
-  messageId String
-  user      User     @relation(fields: [userId], references: [clerk_id])
-  message   Message  @relation(fields: [messageId], references: [id])
-  readAt    DateTime @default(now())
+  id               String          @id @default(cuid())
+  userId           String
+  messageId        String
+  user             User            @relation(fields: [userId], references: [clerk_id])
+  message          Message         @relation(fields: [messageId], references: [id])
+  readAt           DateTime        @default(now())
+  MessageFriends   MessageFriends? @relation(fields: [messageFriendsId], references: [id])
+  messageFriendsId String?
 
   @@unique([userId, messageId])
 }
@@ -134,6 +151,7 @@ enum FriendStatus {
   PENDING
   ACCEPTED
   BLOCKED
+  FRIENDS
 }
 
 model Bot {

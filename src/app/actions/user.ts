@@ -110,6 +110,7 @@ export async function updateUser(userData: {
   userId: string
   name?: string
   username?: string
+  description?: string
   image?: string
 }) {
   try {
@@ -135,6 +136,7 @@ export async function updateUser(userData: {
         name: userData.name,
         username: userData.username,
         image: userData.image || "",
+        description: userData.description || ""
       }
     })
 
@@ -200,8 +202,8 @@ export async function getFriends(userId: string) {
     const friends = await db.friendship.findMany({
       where: {
         OR: [
-          { requesterId: userId, status: "ACCEPTED" },
-          { addresseeId: userId, status: "ACCEPTED" }
+          { requesterId: userId, status: "FRIENDS" },
+          { addresseeId: userId, status: "FRIENDS" }
         ]
       },
       include: {
@@ -293,7 +295,7 @@ export async function acceptFriends(userId: string, addressee: string) {
         ]
       },
       data: {
-        status: "ACCEPTED"
+        status: "FRIENDS"
       }
     });
 

@@ -1,30 +1,34 @@
 "use client";
 
+import { getMessagesFriends } from "@/app/actions/menssagens";
+import { getServersByUserId } from "@/app/actions/servers";
 import { getUserById } from "@/app/actions/user";
 import LoadingScreen from "@/components/loadingScree";
+import InputMenssagens from "@/components/servers/messages/input-menssagens";
+import RenderMessagens from "@/components/servers/messages/message-content-render";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { formatDateComplete } from "@/utils/formatDate";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { IconBar } from "@/types/icnonsListFriends";
+import { formatDateComplete, formatMessageDate } from "@/utils/formatDate";
 import { useAuth } from "@clerk/nextjs";
+import { MessageFriends } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
-import { PhoneCall, Pin, Search, User2Icon, UserCheck, Users, VideoIcon } from "lucide-react";
+import { Search, UserCheck } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-type IconItem = {
-  id: number;
-  icon: React.ComponentType<{ size?: number }>;
-  active: boolean;
-  onClick: () => void;
-};
 
 const ChatFriends = () => {
   const { userId } = useAuth();
   const { id } = useParams<{ id: string; }>();
   const [isOpen, setOpen] = useState(false);
-  const [activeIcon, setActiveIcon] = useState<number | null>(null);
+  const [messageInput, setMessageInput] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [realTimeMessages, setRealTimeMessages] = useState<MessageFriends[]>([]);
+  const [isAtBottom, setIsAtBottom] = useState(true);
 
   const {
     data: friends,
@@ -35,139 +39,330 @@ const ChatFriends = () => {
     queryFn: () => getUserById(id!),
   });
 
+  const {
+    data: currentUserServers,
+    isLoading: isLoadingCurrentUserServers
+  } = useQuery({
+    queryKey: ["currentUserServers", userId],
+    queryFn: () => getServersByUserId(userId!),
+    enabled: !!userId
+  });
+
+  const friendsClerck = friends?.clerk_id
+
+  const {
+    data: friendServers,
+    isLoading: isLoadingFriendServers
+  } = useQuery({
+    queryKey: ["friendServers", friendsClerck],
+    queryFn: () => getServersByUserId(friendsClerck!),
+    enabled: !!friendsClerck
+  });
+
+  const {
+    data: messages,
+    refetch: refetchMessages,
+    isLoading: isLoadingMessages
+  } = useQuery({
+    queryKey: ["messages_friends", userId, friendsClerck],
+    queryFn: () => getMessagesFriends(userId!, friendsClerck!),
+    enabled: !!friendsClerck || !!userId
+  });
+
+  const findCommonServers = () => {
+    if (!currentUserServers || !friendServers) return [];
+
+    return currentUserServers.filter((server: any) =>
+      friendServers.some((friendServer: any) => friendServer.id === server.id)
+    );
+  };
+
+  const commonServers = findCommonServers();
+
+
+  useEffect(() => {
+    if (!id) return;
+
+    const eventSource = new EventSource(`/api/sse/friends?userId=${userId}&friendId=${friendsClerck}`);
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.type === 'new_message') {
+        setRealTimeMessages(prev => [...prev, data.message]);
+      }
+      else if (data.type === 'deleted_message') {
+        setRealTimeMessages(prev => prev.filter(msg => msg.id !== data.messageId));
+      }
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [id]);
+
+  useEffect(() => {
+    if (isAtBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [realTimeMessages, isAtBottom]);
+
+  const handleScroll = () => {
+    if (scrollAreaRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollAreaRef.current;
+      const threshold = 50; // pixels from bottom
+      setIsAtBottom(scrollHeight - (scrollTop + clientHeight) < threshold);
+    }
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setIsAtBottom(true);
+  };
+
+
   const handleMenuInfor = () => {
     setOpen(prev => !prev);
-    setActiveIcon(5);
   };
 
-  const handleIconClick = (iconId: number) => {
-    switch (iconId) {
-      case 1:
-        console.log("Iniciar chamada de voz");
-        break;
-      case 2:
-        console.log("Iniciar chamada de vídeo");
-        break;
-      case 3:
-        console.log("Mostrar mensagens fixadas");
-        break;
-      case 4:
-        console.log("Mostrar membros do chat");
-        break;
-      case 5:
-        handleMenuInfor();
-        break;
-      default:
-        break;
-    }
-
-    setActiveIcon(iconId === activeIcon ? null : iconId);
+  const handleVoiceCall = () => {
+    console.log("Chamada de voz iniciada");
   };
 
-  const iconsList: IconItem[] = [
-    {
-      id: 1,
-      icon: PhoneCall,
-      active: activeIcon === 1,
-      onClick: () => handleIconClick(1)
-    },
-    {
-      id: 2,
-      icon: VideoIcon,
-      active: activeIcon === 2,
-      onClick: () => handleIconClick(2)
-    },
-    {
-      id: 3,
-      icon: Pin,
-      active: activeIcon === 3,
-      onClick: () => handleIconClick(3)
-    },
-    {
-      id: 4,
-      icon: Users,
-      active: activeIcon === 4,
-      onClick: () => handleIconClick(4)
-    },
-    {
-      id: 5,
-      icon: User2Icon,
-      active: isOpen,
-      onClick: handleMenuInfor
-    }
-  ];
+  const handleVideoCall = () => {
+    console.log("Chamada de vídeo iniciada");
+  };
 
-  if (isLoading) {
+  const handleSendMessage = async () => {
+    if (!messageInput.trim() || !friendsClerck || !userId) return;
+
+    await fetch("/api/messages/friends", {
+      method: "POST",
+      body: JSON.stringify({
+        content: messageInput,
+        sendId: userId,
+        receivesId: friendsClerck
+
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    setMessageInput("");
+    await refetchMessages();
+  };
+
+  const handleDeleteMessage = () => {
+
+  }
+
+  const allMessages = Array.from(
+    new Map([...(messages || []), ...(realTimeMessages || [])]
+      .map(m => [m.id, m]))
+      .values()
+  );
+
+  const groupedMessages = allMessages.reduce((acc, message) => {
+    const messageDate = new Date(message.createdAt)
+    const dateKey = formatMessageDate(messageDate)
+
+    if (!acc[dateKey]) {
+      acc[dateKey] = []
+    }
+
+    acc[dateKey].push(message)
+    return acc
+  }, {} as Record<string, typeof allMessages>)
+
+
+  if (isLoading || isLoadingMessages) {
     return <LoadingScreen />;
   }
 
   return (
-    <div className="w-full h-full">
-      <div className="flex justify-between items-center p-2 border-b w-full bg-[#1A1A1E]">
-        <div className="flex items-center gap-1.5">
-          <Avatar className={cn("w-8 h-8 rounded-full")}>
-            <AvatarImage src={friends?.image!} alt={friends?.username!} />
-            <AvatarFallback>
-              {friends?.username?.charAt(0).toLowerCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="">
-            <span className="font-semibold text-base text-zinc-300">{friends?.name}</span>
+    <div className="w-full h-full bg-[#1A1A1E] text-gray-100">
+      {/* Header */}
+      <div className="w-full sticky top-0 z-50 bg-[#1A1A1E] shadow-sm">
+        <div className="flex justify-between items-center px-4 py-2 border-b border-[#1e1f22] w-full">
+          <div className="flex items-center gap-2">
+            <Avatar className="w-8 h-8 rounded-full">
+              <AvatarImage src={friends?.image!} alt={friends?.username!} />
+              <AvatarFallback className="bg-[#5865f2] text-white">
+                {friends?.username?.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="font-semibold text-base text-gray-100">{friends?.name}</span>
+              <span className="text-xs text-gray-400">{friends?.isOnline || "Offline"}</span>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="flex items-center gap-3">
-            {iconsList.map((ic) => (
-              <button
-                key={ic.id}
-                onClick={ic.onClick}
-                className={`cursor-pointer p-0.5 rounded-full hover:text-white text-zinc-400 ${ic.active ? "bg-zinc-700/60 " : ""}`}
-              >
-                <ic.icon size={18} key={ic.id} />
-              </button>
-            ))}
-          </div>
-          <div className="w-[180px] relative ml-4">
-            <Input placeholder="Buscar..." className="relative w-full h-8 bg-[#1e1f22] border-none focus-visible:ring-0" />
-            <Search size={18} className="absolute top-1.5 right-3 text-zinc-400" />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <IconBar
+                onVoiceCall={handleVoiceCall}
+                onVideoCall={handleVideoCall}
+                onUserInfo={handleMenuInfor}
+                className="text-gray-400 hover:text-gray-200"
+              />
+            </div>
+            <div className="w-[180px] relative">
+              <Input
+                placeholder="Buscar..."
+                className="w-full h-8 bg-[#1e1f22] text-sm border-none focus-visible:ring-0 text-gray-200 placeholder:text-gray-400"
+              />
+              <Search size={16} className="absolute top-2 right-2.5 text-gray-400" />
+            </div>
           </div>
         </div>
       </div>
-      <div className="flex w-full h-full">
-        <div className="flex-1">
-          chat
+
+      {/* Main Content */}
+      <div className="flex flex-1 overflow-hidden h-[calc(100vh-48px)]">
+        <div className={`flex flex-col flex-1 overflow-hidden ${isOpen ? "w-[calc(100%-350px)]" : "w-full"}`}>
+          <div className="flex flex-col w-full h-full p-4 overflow-hidden">
+            <ScrollArea
+              className="h-full w-full pr-4"
+              ref={scrollAreaRef}
+              onScroll={handleScroll}
+            >
+              <div className="flex flex-col gap-4  pb-8">
+                {/* Friend Profile */}
+                <div className="mt-4 flex flex-col">
+                  <Avatar className="w-20 h-20 bg-[#1e1f22] p-0.5 rounded-full border-4 border-[#1e1f22]">
+                    <AvatarImage className="rounded-full object-cover" src={friends?.image!} alt={friends?.username!} />
+                    <AvatarFallback className="bg-[#5865f2] text-white">
+                      {friends?.username?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col mt-3">
+                    <span className="font-semibold text-xl text-gray-100">{friends?.name}</span>
+                    <span className="text-sm text-gray-400">@{friends?.username}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-gray-400 mt-4 text-center">
+                    <span>Este é o começo do seu histórico de mensagens diretas com</span>
+                    <span className="font-semibold text-gray-200">{friends?.name}.</span>
+                  </div>
+                </div>
+
+                {/* Common Servers */}
+                <div className="w-full max-w-[600px] mt-3">
+                  {isLoadingCurrentUserServers || isLoadingFriendServers ? (
+                    <div className="flex justify-center">
+                      <span className="text-sm text-gray-400">Carregando servidores em comum...</span>
+                    </div>
+                  ) : commonServers.length > 0 ? (
+                    <div className="bg-[#2b2d31] rounded-lg p-3">
+                      <h3 className="text-xs font-semibold text-gray-400 mb-2">SERVIDORES EM COMUM</h3>
+                      <div className="flex flex-col gap-1">
+                        {commonServers.map(server => (
+                          <div key={server.id} className="flex items-center gap-2 p-2 hover:bg-[#35373c] rounded-md cursor-pointer">
+                            <Avatar className="w-8 h-8">
+                              <AvatarImage src={server.image!} />
+                              <AvatarFallback className="bg-[#5865f2] text-white">
+                                {server.name.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-400">
+                      Nenhum servidor em comum
+                    </div>
+                  )}
+                </div>
+
+                {/* Messages */}
+                <div className="w-full">
+                  {Object.entries(groupedMessages).map(([date, messages]) => (
+                    <div key={date} className="mb-6 w-full">
+                      <div className="flex w-full relative my-4">
+                        <div className="z-[99] flex items-center justify-center w-full">
+                          <div className="w-full h-0.5 bg-[#3f4248]"></div>
+                          <span className="flex w-[450px] items-center justify-center text-xs text-zinc-400 px-2">
+                            {date}
+                          </span>
+                          <div className="w-full h-0.5 bg-[#3f4248]"></div>
+                        </div>
+                      </div>
+
+                      <RenderMessagens
+                        allMessages={messages as any}
+                        messagesEndRef={messagesEndRef}
+                        handleDeleteMessage={handleDeleteMessage}
+                        currentUserId={userId!}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </ScrollArea>
+          </div>
+
+          {/* Message Input */}
+          <div className="sticky bottom-10 bg-[#1A1A1E] p-4 pt-0">
+            <InputMenssagens
+              name={friends?.name || "user"}
+              messageInput={messageInput}
+              handleSendMessage={handleSendMessage}
+              setMessageInput={setMessageInput}
+            />
+          </div>
         </div>
+
+        {/* User Info Panel */}
         {isOpen && (
-          <div className="w-[350px] h-full border-l-1 border-zinc-700 relative">
-            <div className="w-full h-28 bg-blue-600 relative"></div>
-            <div className="absolute top-0 right-0 p-2">
-              <Button className="bg-zinc-800/40 w-8 h-8 rounded-full text-white hover:bg-zinc-800/60 cursor-pointer">
-                <UserCheck />
+          <div className="w-[350px] h-full bg-[#2b2d31] border-l border-[#1e1f22] flex-shrink-0 overflow-y-auto">
+            <div className="w-full h-32 bg-[#5865f2] relative"></div>
+            <div className="absolute top-2 right-2">
+              <Button className="bg-[#1e1f22]/80 w-8 h-8 rounded-full text-white hover:bg-[#1e1f22] cursor-pointer">
+                <UserCheck size={18} />
               </Button>
             </div>
-            <div className="flex w-full h-full flex-col gap-3.5 top-20 z-50 absolute bottom-0 p-3">
-              <div className="">
-                <Avatar className={cn("w-20 h-20 border bg-zinc-800 p-0.5 rounded-full")}>
+            <div className="relative px-4 pb-4">
+              <div className="flex flex-col items-center -mt-16">
+                <Avatar className="w-20 h-20 border-4 border-[#2b2d31] rounded-full">
                   <AvatarImage className="rounded-full object-cover" src={friends?.image!} alt={friends?.username!} />
-                  <AvatarFallback>
-                    {friends?.username?.charAt(0).toLowerCase()}
+                  <AvatarFallback className="bg-[#5865f2] text-white">
+                    {friends?.username?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-base font-semibold">{friends?.name}</span>
-                <span className="text-sm text-zinc-300 font-sans">{friends?.username}</span>
-              </div>
-              <div className="mt-2 bg-zinc-900 rounded-md w-full h-auto min-h-40 p-2">
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-xs font-semibold">Sobre mim</span>
-                  <span>{friends?.description}</span>
+                <div className="flex flex-col items-center mt-3">
+                  <span className="text-lg font-semibold">{friends?.name}</span>
+                  <span className="text-sm text-gray-400">@{friends?.username}</span>
                 </div>
-                <div className="flex flex-col gap-1.5 mt-4">
-                  <span className="text-xs font-semibold">Membro desde</span>
-                  <span className="text-xs text-zinc-400 font-semibold">
-                    {formatDateComplete(new Date(friends?.createdAt || ""))}</span>
+              </div>
+
+              <div className="mt-6 bg-[#1e1f22] rounded-lg p-4">
+                <h3 className="text-xs font-semibold text-gray-400 mb-2">SOBRE MIM</h3>
+                <p className="text-sm text-gray-200">
+                  {friends?.description || "Nenhuma descrição fornecida."}
+                </p>
+
+                <div className="mt-6 pt-4 border-t border-[#3f4248]">
+                  <h3 className="text-xs font-semibold text-gray-400 mb-2">INFORMAÇÕES</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs text-gray-400">Membro desde</p>
+                      <p className="text-sm text-gray-200">
+                        {formatDateComplete(new Date(friends?.createdAt || ""))}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400">?.isOnline</p>
+                      <p className="text-sm text-gray-200">
+                        {friends?.isOnline || "Offline"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
+              </div>
+
+              <div className="mt-4">
+                <Button className="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white">
+                  Enviar mensagem
+                </Button>
               </div>
             </div>
           </div>

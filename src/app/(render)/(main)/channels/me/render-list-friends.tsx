@@ -93,7 +93,7 @@ const DetailsFriends = ({ userId }: UserIdProps) => {
                 <Loader size={20} className="animate-spin" />
               </div>
             ) : (
-              filteredFriends?.filter((frind => frind.status === "ACCEPTED"))
+              filteredFriends?.filter((frind => frind.status === "FRIENDS"))
                 .map((frind) => {
 
                   const isRequester = frind.requesterId === userId;
