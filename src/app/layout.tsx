@@ -23,7 +23,6 @@ export default function RootLayout({
       <ClerkProvider>
         <html lang="pt-br" suppressHydrationWarning>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="icon" href="/images/icon.jpeg" />
           <head />
           <body>
             <ThemeProvider

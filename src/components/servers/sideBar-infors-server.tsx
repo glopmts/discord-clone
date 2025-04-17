@@ -2,6 +2,7 @@
 
 import { createNewsCategory, deleteCategoryId } from "@/app/actions/category"
 import { createChannel } from "@/app/actions/channels"
+import { markMessagesChannelRead } from "@/app/actions/menssagens"
 import { geServer } from "@/app/actions/servers"
 import { channelIcons } from "@/components/iconsChannels"
 import { UserIdProps } from "@/types/interfaces"
@@ -10,7 +11,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import renderDirectMessages from "../infor-bar/renderDirectMessages"
+import RenderDirectMessages from "../infor-bar/renderDirectMessages"
 import { renderModalContent } from "../infor-bar/renderModalContent"
 import GenericModal from "../modals/GenericModal"
 import { Button } from "../ui/button"
@@ -41,7 +42,7 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     variant: null,
   });
 
-
+  //Query get server
   const {
     data: server,
     isLoading,
@@ -58,6 +59,17 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
       refetch()
     }
   }, [id, refetch]);
+
+  const handleChannelClick = async (channelId: string) => {
+    try {
+      if (userId) {
+        await markMessagesChannelRead(channelId, userId);
+      }
+      handleServerClick(channelId);
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
+    }
+  };
 
   const handleServerClick = (channelId: string) => {
     router.push(`/channels/?id=${id}&chaId=${channelId}`)
@@ -200,13 +212,14 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
                       handleNewsChannel={handleNewsChannel}
                     />
                   </div>
-                  <div className="w-full h-[80vh] overflow-y-scroll scroll-style">
+                  <div className="w-full h-[72vh] overflow-y-auto scroll-style">
                     <RenderServerChannels
                       server={server}
+                      userId={userId}
                       currentChannelId={currentChannelId!}
                       handleNewsChannel={handleNewsChannel}
                       handleNewsCategory={handleNewsCategory}
-                      handleServerClick={handleServerClick}
+                      handleServerClick={handleChannelClick}
                       handleDelete={handleDeleteCategory}
                       handleEdite={() => { }}
                     />
@@ -234,7 +247,7 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
                   </div>
                 </>
               ) : (
-                renderDirectMessages()
+                <RenderDirectMessages userId={userId} />
               )}
             </div>
           </div>

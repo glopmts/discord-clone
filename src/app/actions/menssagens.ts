@@ -38,6 +38,43 @@ export async function markAllMessagesAsRead(serverId: string, userId: string) {
 }
 
 
+export async function markMessagesChannelRead(channelId: string, userId: string) {
+  try {
+    if (!channelId || !userId) {
+      throw new Error("Channel ID e User ID são obrigatórios.");
+    }
+
+    const unreadMessages = await db.message.findMany({
+      where: {
+        channelId: channelId,
+        MessageRead: {
+          none: { userId }
+        }
+      },
+      select: { id: true }
+    });
+
+    if (unreadMessages.length === 0) return;
+
+    const readRecords = unreadMessages.map(message => ({
+      userId,
+      messageId: message.id
+    }));
+
+    await db.messageRead.createMany({
+      data: readRecords,
+      skipDuplicates: true
+    });
+
+    return unreadMessages.length;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to mark messages as read: ${error.message}`);
+    }
+    throw new Error("Failed to mark messages as read");
+  }
+}
+
 export async function deleteMessage(userId: string, messageId: string) {
   try {
     if (!messageId || !userId) {
@@ -57,9 +94,14 @@ export async function deleteMessage(userId: string, messageId: string) {
       throw new Error("Sem permissão para deletar esta mensagem.");
     }
 
-    await db.message.delete({
-      where: { id: messageId },
-    });
+    await db.$transaction([
+      db.messageRead.deleteMany({
+        where: { messageId }
+      }),
+      db.message.delete({
+        where: { id: messageId }
+      })
+    ]);
 
     return { success: true };
 
@@ -70,6 +112,32 @@ export async function deleteMessage(userId: string, messageId: string) {
     throw new Error("Falha ao deletar mensagem");
   }
 }
+
+export async function getUnreadMessagesCount(userId: string, channelId: string) {
+  try {
+    if (!userId || !channelId) {
+      return 0;
+    }
+
+    const count = await db.message.count({
+      where: {
+        channelId: channelId,
+        MessageRead: {
+          none: {
+            userId: userId
+          }
+        }
+      }
+    });
+
+    return count;
+  } catch (error) {
+    console.error("Error fetching unread messages count:", error);
+    return 0;
+  }
+}
+
+//friends functions
 
 export async function getMessagesFriends(userId: string, receivesId: string) {
   try {
@@ -101,3 +169,59 @@ export async function getMessagesFriends(userId: string, receivesId: string) {
     throw new Error("Failed to get messages between friends");
   }
 }
+
+
+export async function getDirectMessages(userId: string) {
+  try {
+    if (!userId) {
+      throw new Error("User ID is required!");
+    }
+
+    const conversations = await db.messageFriends.findMany({
+      where: {
+        OR: [
+          { sendId: userId },
+          { receivesId: userId }
+        ]
+      },
+      select: {
+        sendUser: {
+          select: {
+            id: true,
+            clerk_id: true,
+            username: true,
+            name: true,
+            image: true,
+          }
+        },
+        receivesFriends: {
+          select: {
+            id: true,
+            clerk_id: true,
+            username: true,
+            name: true,
+            image: true,
+          }
+        }
+      },
+      distinct: ['sendId', 'receivesId']
+    });
+
+    const otherUsers = conversations
+      .map(conv =>
+        conv.sendUser.clerk_id === userId
+          ? conv.receivesFriends
+          : conv.sendUser
+      )
+      .filter((user, index, self) =>
+        index === self.findIndex(u => u.clerk_id === user.clerk_id)
+      );
+
+    return otherUsers;
+
+  } catch (error) {
+    console.error("Error getting conversation partners:", error);
+    return [];
+  }
+}
+

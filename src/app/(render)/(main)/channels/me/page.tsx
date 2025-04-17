@@ -31,7 +31,7 @@ const Me = () => {
   const { userId, isLoaded } = useAuth();
   const [tabs, setTabs] = useState(1)
 
-  if (!isLoaded) {
+  if (isLoaded) {
     <LoadingScreen />
   }
 

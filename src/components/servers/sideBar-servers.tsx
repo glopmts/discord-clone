@@ -34,7 +34,6 @@ const SideBarServers = ({ userId }: UserIdProps) => {
   const {
     data: servers,
     isLoading,
-    error,
     refetch,
   } = useQuery({
     queryKey: ["servers", userId],
@@ -57,6 +56,7 @@ const SideBarServers = ({ userId }: UserIdProps) => {
     if (firstChannelId) {
       queryParams.set('chaId', firstChannelId);
     }
+
 
     router.push(`/channels/?${queryParams.toString()}`);
   };

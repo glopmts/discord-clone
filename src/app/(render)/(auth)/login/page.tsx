@@ -45,7 +45,7 @@ const LoginPage = () => {
       })
 
       if (result.success) {
-        router.push("/channels/me")
+        window.location.href = "/channels/me"
         return
       }
 
@@ -66,7 +66,8 @@ const LoginPage = () => {
   }
 
   const handleCodeSuccess = () => {
-    router.push("/channels/me")
+    const redirectUrl = new URLSearchParams(window.location.search).get("redirect_url") || "/channels/me"
+    router.replace(redirectUrl)
   }
 
   return (

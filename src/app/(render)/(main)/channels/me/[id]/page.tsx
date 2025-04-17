@@ -2,7 +2,7 @@
 
 import { getMessagesFriends } from "@/app/actions/menssagens";
 import { getServersByUserId } from "@/app/actions/servers";
-import { getUserById } from "@/app/actions/user";
+import { deleteMessageFriends, getUserById } from "@/app/actions/user";
 import LoadingScreen from "@/components/loadingScree";
 import InputMenssagens from "@/components/servers/messages/input-menssagens";
 import RenderMessagens from "@/components/servers/messages/message-content-render";
@@ -10,14 +10,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { socket } from "@/services/socket-io";
 import { IconBar } from "@/types/icnonsListFriends";
 import { formatDateComplete, formatMessageDate } from "@/utils/formatDate";
 import { useAuth } from "@clerk/nextjs";
 import { MessageFriends } from "@prisma/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Search, UserCheck } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 
 const ChatFriends = () => {
@@ -29,11 +31,11 @@ const ChatFriends = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [realTimeMessages, setRealTimeMessages] = useState<MessageFriends[]>([]);
   const [isAtBottom, setIsAtBottom] = useState(true);
+  const queryClient = useQueryClient();
 
   const {
     data: friends,
     isLoading,
-    refetch
   } = useQuery({
     queryKey: ["userMessages", id],
     queryFn: () => getUserById(id!),
@@ -49,6 +51,7 @@ const ChatFriends = () => {
   });
 
   const friendsClerck = friends?.clerk_id
+  const friendId = friends?.clerk_id
 
   const {
     data: friendServers,
@@ -79,88 +82,77 @@ const ChatFriends = () => {
 
   const commonServers = findCommonServers();
 
-
   useEffect(() => {
-    if (!id) return;
-
-    const eventSource = new EventSource(`/api/sse/friends?userId=${userId}&friendId=${friendsClerck}`);
-
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      if (data.type === 'new_message') {
-        setRealTimeMessages(prev => [...prev, data.message]);
-      }
-      else if (data.type === 'deleted_message') {
-        setRealTimeMessages(prev => prev.filter(msg => msg.id !== data.messageId));
-      }
-    };
+    if (userId) {
+      socket.emit('join_user_room', userId);
+    }
 
     return () => {
-      eventSource.close();
+      if (userId) {
+        socket.emit('leave_user_room', userId);
+      }
     };
-  }, [id]);
+  }, [userId]);
 
   useEffect(() => {
-    if (isAtBottom) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [realTimeMessages, isAtBottom]);
+    const handleNewMessage = (newMessage: MessageFriends) => {
+      setRealTimeMessages(prev => {
+        const isDuplicate = prev.some(msg =>
+          msg.content === newMessage.content &&
+          new Date(msg.createdAt).getTime() === new Date(newMessage.createdAt).getTime()
+        );
 
-  const handleScroll = () => {
-    if (scrollAreaRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = scrollAreaRef.current;
-      const threshold = 50; // pixels from bottom
-      setIsAtBottom(scrollHeight - (scrollTop + clientHeight) < threshold);
-    }
-  };
+        if (!isDuplicate) {
+          return [...prev, newMessage];
+        }
+        return prev;
+      });
+    };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    setIsAtBottom(true);
-  };
+    socket.on('new_friend_message', handleNewMessage);
 
+    return () => {
+      socket.off('new_friend_message', handleNewMessage);
+    };
+  }, []);
 
-  const handleMenuInfor = () => {
-    setOpen(prev => !prev);
-  };
-
-  const handleVoiceCall = () => {
-    console.log("Chamada de voz iniciada");
-  };
-
-  const handleVideoCall = () => {
-    console.log("Chamada de vídeo iniciada");
-  };
 
   const handleSendMessage = async () => {
-    if (!messageInput.trim() || !friendsClerck || !userId) return;
+    if (!messageInput.trim() || !friendId || !userId) return;
 
-    await fetch("/api/messages/friends", {
-      method: "POST",
-      body: JSON.stringify({
+    setMessageInput("");
+
+    try {
+      const newMessage = await socket.emitWithAck('send_friend_message', {
         content: messageInput,
         sendId: userId,
-        receivesId: friendsClerck
+        receivesId: friendId
+      });
 
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    setMessageInput("");
-    await refetchMessages();
+      queryClient.setQueryData(
+        ["messages_friends", userId, friendsClerck],
+        (old: MessageFriends[] | undefined) => [...(old || []), newMessage]
+      );
+    } catch (error) {
+      console.error('Erro ao enviar mensagem:', error);
+    }
   };
 
-  const handleDeleteMessage = () => {
 
-  }
+  const allMessages = useMemo(() => {
+    const combined = [...(messages || []), ...(realTimeMessages || [])];
 
-  const allMessages = Array.from(
-    new Map([...(messages || []), ...(realTimeMessages || [])]
-      .map(m => [m.id, m]))
-      .values()
-  );
+    const uniqueMessages = combined.reduce((acc, current) => {
+      if (!acc.some(msg => msg.id === current.id)) {
+        acc.push(current);
+      }
+      return acc;
+    }, [] as MessageFriends[]);
+
+    return uniqueMessages.sort((a, b) =>
+      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+  }, [messages, realTimeMessages]);
 
   const groupedMessages = allMessages.reduce((acc, message) => {
     const messageDate = new Date(message.createdAt)
@@ -175,12 +167,60 @@ const ChatFriends = () => {
   }, {} as Record<string, typeof allMessages>)
 
 
+  useEffect(() => {
+    const scrollToBottom = () => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    if (isAtBottom) {
+      scrollToBottom();
+    }
+
+    const lastMessage = allMessages[allMessages.length - 1];
+    if (lastMessage?.sendId === userId) {
+      scrollToBottom();
+    }
+  }, [allMessages, isAtBottom, userId]);
+
+  const handleScroll = () => {
+    if (scrollAreaRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollAreaRef.current;
+      const threshold = 50;
+      setIsAtBottom(scrollHeight - (scrollTop + clientHeight) < threshold);
+    }
+  };
+
+
+  const handleDeleteMessage = async (messageId: string) => {
+    try {
+      await deleteMessageFriends(userId!, messageId);
+      setRealTimeMessages(prev => prev.filter(msg => msg.id !== messageId));
+      await refetchMessages();
+    } catch (error) {
+      console.error("Erro ao deletar mensagem:", error);
+      toast.error(error instanceof Error ? error.message : "Erro ao deletar mensagem!");
+    }
+  }
+
+  const handleMenuInfor = () => {
+    setOpen(prev => !prev);
+  };
+
+  const handleVoiceCall = () => {
+    console.log("Chamada de voz iniciada");
+  };
+
+  const handleVideoCall = () => {
+    console.log("Chamada de vídeo iniciada");
+  };
+
+
   if (isLoading || isLoadingMessages) {
     return <LoadingScreen />;
   }
 
   return (
-    <div className="w-full h-full bg-[#1A1A1E] text-gray-100">
+    <div className="w-full h-full overflow-hidden bg-[#1A1A1E] text-gray-100">
       {/* Header */}
       <div className="w-full sticky top-0 z-50 bg-[#1A1A1E] shadow-sm">
         <div className="flex justify-between items-center px-4 py-2 border-b border-[#1e1f22] w-full">
@@ -217,7 +257,7 @@ const ChatFriends = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden h-[calc(100vh-48px)]">
+      <div className="flex flex-1 w-full overflow-hidden h-[calc(100vh-80px)]">
         <div className={`flex flex-col flex-1 overflow-hidden ${isOpen ? "w-[calc(100%-350px)]" : "w-full"}`}>
           <div className="flex flex-col w-full h-full p-4 overflow-hidden">
             <ScrollArea
@@ -295,13 +335,14 @@ const ChatFriends = () => {
                       />
                     </div>
                   ))}
+                  <div ref={messagesEndRef} />
                 </div>
               </div>
             </ScrollArea>
           </div>
 
           {/* Message Input */}
-          <div className="sticky bottom-10 bg-[#1A1A1E] p-4 pt-0">
+          <div className="sticky bottom-3 bg-[#1A1A1E] p-4 pt-0">
             <InputMenssagens
               name={friends?.name || "user"}
               messageInput={messageInput}
@@ -324,7 +365,7 @@ const ChatFriends = () => {
               <div className="flex flex-col items-center -mt-16">
                 <Avatar className="w-20 h-20 border-4 border-[#2b2d31] rounded-full">
                   <AvatarImage className="rounded-full object-cover" src={friends?.image!} alt={friends?.username!} />
-                  <AvatarFallback className="bg-[#5865f2] text-white">
+                  <AvatarFallback className="bg-[#313133] text-white">
                     {friends?.username?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>

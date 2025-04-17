@@ -1,6 +1,8 @@
+import { getUnreadMessagesCount, markMessagesChannelRead } from "@/app/actions/menssagens"
 import { channelIcons } from "@/components/iconsChannels"
 import { InterfacesRender } from "@/types/interfaces"
 import { Calendar, LucideListMinus, Plus, Users } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
 import { Button } from "../ui/button"
@@ -34,13 +36,13 @@ const optionsContextMenu = ({ handleEdite, handleDelete, category }: FunctionsPr
       handleDelete(category?.id!, category?.name!);
       handleCloseMenu();
     }
-  }
+  },
 ]
 
 const RenderServerChannels = ({
   server,
+  userId,
   currentChannelId,
-  handleServerClick,
   handleNewsChannel,
   handleNewsCategory,
   handleDelete,
@@ -49,6 +51,46 @@ const RenderServerChannels = ({
   if (!server) return null;
 
   const [openItems, setOpenItems] = useState<string[]>(['item-1']);
+  const router = useRouter()
+
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const fetchUnreadCounts = async () => {
+      const counts: Record<string, number> = {};
+
+      for (const category of server.Category || []) {
+        for (const channel of category.channels) {
+          const count = await getUnreadMessagesCount(userId, channel.id);
+          counts[channel.id] = count;
+        }
+      }
+
+      setUnreadCounts(counts);
+    };
+
+    if (server && userId) {
+      fetchUnreadCounts();
+    }
+  }, [server, userId]);
+
+  const handleChannelClick = async (channelId: string) => {
+    try {
+      if (userId) {
+        await markMessagesChannelRead(channelId, userId);
+      }
+      handleServerClick(channelId);
+      const updatedCounts = { ...unreadCounts };
+      updatedCounts[channelId] = 0;
+      setUnreadCounts(updatedCounts);
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
+    }
+  };
+
+  const handleServerClick = (channelId: string) => {
+    router.push(`/channels/?id=${server.id}&chaId=${channelId}`)
+  };
 
   useEffect(() => {
     if (server.Category) {
@@ -89,9 +131,6 @@ const RenderServerChannels = ({
       <div className="mt-4">
         <div className="mt-1">
           {server.Category?.map((category) => {
-            const channelId = category.channels.map((c) => c.id)
-            const isActive = channelId.includes(currentChannelId || "")
-
             return (
               <div className="w-full" key={category.id}>
                 <div className="px-3 flex items-center justify-between group relative">
@@ -139,18 +178,27 @@ const RenderServerChannels = ({
                         </ContextMenuContent>
                       </ContextMenu>
                       <AccordionContent className="w-full ">
-                        {category.channels.map((chanells) => (
-                          <div className="w-full" key={chanells.id}>
-                            <Button
-                              variant={isActive ? "secondary" : "ghost"}
-                              onClick={() => handleServerClick(chanells.id)}
-                              className="w-full justify-start px-3 py-1 text-neutral-400 hover:text-white hover:bg-zinc-700/50 rounded-sm"
-                            >
-                              {channelIcons[chanells.typeChannel]}
-                              <span className="truncate">{chanells.name}</span>
-                            </Button>
-                          </div>
-                        ))}
+                        {category.channels.map((chanells) => {
+                          const isActive = chanells.id === currentChannelId;
+                          const unreadCount = unreadCounts[chanells.id] || 0;
+                          const hasUnreadMessages = unreadCount > 0;
+
+                          return (
+                            <div className="w-full relative" key={chanells.id}>
+                              {hasUnreadMessages && (
+                                <div className="absolute z-20 w-1 h-2 top-3 bg-white rounded-r-full transition-all" />
+                              )}
+                              <Button
+                                variant={isActive ? "secondary" : "ghost"}
+                                onClick={() => handleChannelClick(chanells.id)}
+                                className="w-full relative justify-start px-3 py-1 text-neutral-400 hover:text-white hover:bg-zinc-700/50 rounded-sm"
+                              >
+                                {channelIcons[chanells.typeChannel]}
+                                <span className="truncate">{chanells.name}</span>
+                              </Button>
+                            </div>
+                          );
+                        })}
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>

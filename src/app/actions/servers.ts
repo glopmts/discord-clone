@@ -171,6 +171,7 @@ export async function geServerCode(id: string) {
   }
 }
 
+
 export async function joinServer(userId: string, serverId: string) {
   try {
     if (!userId || !serverId) throw new Error("Missing userId or serverId");

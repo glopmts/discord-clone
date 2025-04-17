@@ -67,7 +67,7 @@ const MemberServer = ({ server, currentUserId, handleExpulseMember }: ServerProp
           <div className="mt-2">
             {server.members.map((member) => {
               const memberRole = getMemberRole(member.id);
-              const canDelete = canDeletePermission(currentUserId, member, server as any);
+              const canDelete = canDeletePermission(currentUserId, member as any, server as any);
 
               return (
                 <ContextMenuGlobe

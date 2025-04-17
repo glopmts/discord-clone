@@ -83,6 +83,7 @@ export interface InterfacesRender {
     }[];
     members?: any[];
   };
+  userId: string;
 
   handleNewsChannel: (categoryId?: string) => void;
   handleNewsCategory: () => void;

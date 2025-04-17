@@ -7,17 +7,17 @@ import { geServer } from "@/app/actions/servers";
 import MemberServer from "@/components/infor-bar/member-server";
 import InputMenssagens from "@/components/servers/messages/input-menssagens";
 import RenderMessagens from "@/components/servers/messages/message-content-render";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
+import { socket } from "@/services/socket-io";
 import { MessageProps } from "@/types/interfaces";
 import { formatMessageDate } from "@/utils/formatDate";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Dot, Hash, Loader, Pin, Search, Users } from "lucide-react";
+import { Dot, Hash, Loader } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import HeaderChannels from "./components/header-channels";
 
 const Channels = () => {
   const { userId } = useAuth();
@@ -47,32 +47,83 @@ const Channels = () => {
   const {
     data: server,
     isLoading: loaderServer,
-    refetch
   } = useQuery({
     queryKey: ["server", serverId],
     queryFn: () => geServer(serverId!),
   });
 
+
   useEffect(() => {
-    if (!id) return;
-
-    const eventSource = new EventSource(`/api/sse?channelId=${id}`);
-
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      if (data.type === 'new_message') {
-        setRealTimeMessages(prev => [...prev, data.message]);
-      }
-      else if (data.type === 'deleted_message') {
-        setRealTimeMessages(prev => prev.filter(msg => msg.id !== data.messageId));
-      }
-    };
+    if (id) {
+      setRealTimeMessages([]);
+      socket.emit('join_channel_room', id);
+    }
 
     return () => {
-      eventSource.close();
+      if (id) {
+        socket.emit('leave_channel_room', id);
+      }
     };
   }, [id]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (id) {
+        setRealTimeMessages([]);
+        await refreshChannel();
+      }
+    };
+
+    fetchData();
+  }, [id, refreshChannel]);
+
+  useEffect(() => {
+    const handleNewMessage = (newMessage: MessageProps) => {
+      setRealTimeMessages(prev => [...prev, newMessage]);
+      if (isAtBottom) {
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    };
+
+    socket.on('new_chat_message', handleNewMessage);
+
+    return () => {
+      socket.off('new_chat_message', handleNewMessage);
+    };
+  }, [isAtBottom]);
+
+
+  const handleSendMessage = async () => {
+    if (!messageInput.trim() || !id || !userId) return;
+
+    try {
+      const newMessage = await new Promise<MessageProps>((resolve, reject) => {
+        socket.emit(
+          'send_chats_message',
+          {
+            content: messageInput,
+            userId: userId,
+            channelId: id
+          },
+          (response: MessageProps | { error: string }) => {
+            if ('error' in response) {
+              reject(response.error);
+            } else {
+              resolve(response);
+            }
+          }
+        );
+      });
+
+      setMessageInput("");
+      setRealTimeMessages(prev => [...prev, newMessage]);
+    } catch (error) {
+      console.error('Erro ao enviar mensagem:', error);
+      toast.error(typeof error === 'string' ? error : 'Erro ao enviar mensagem');
+    }
+  };
 
   useEffect(() => {
     if (isAtBottom) {
@@ -91,25 +142,6 @@ const Channels = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     setIsAtBottom(true);
-  };
-
-  const handleSendMessage = async () => {
-    if (!messageInput.trim() || !id || !userId) return;
-
-    await fetch("/api/messages", {
-      method: "POST",
-      body: JSON.stringify({
-        content: messageInput,
-        userId,
-        channelId: id,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    await refreshChannel();
-    setMessageInput("");
   };
 
   const channelMessages = channel?.messages || [];
@@ -165,35 +197,12 @@ const Channels = () => {
     <div className="w-full h-full flex flex-col bg-[#1A1A1E]">
       <div className="p-2 w-full h-full flex flex-col">
         {/* header */}
-        <div className="px-2">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-1.5">
-              <Hash size={20} className="text-zinc-500" />
-              <div className="flex items-center gap-1.5">
-                💬 <Dot size={16} /> <span className="truncate">{channel?.name}</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3.5">
-              <Bell size={18} className="text-zinc-400 hover:text-zinc-200 cursor-pointer" />
-              <Pin size={18} className="text-zinc-400 hover:text-zinc-200 cursor-pointer" />
-              <div className="">
-                <button onClick={handleListMembers} className="cursor-pointer hover:bg-zinc-700/20 p-1 rounded-full">
-                  <Users size={18} className={memBersList ? "text-white" : "text-zinc-400 hover:text-zinc-200"} />
-                </button>
-              </div>
-              <div className="w-[180px] relative ml-4">
-                <Input placeholder="Buscar..." className="relative w-full h-8 bg-[#1e1f22] border-none focus-visible:ring-0" />
-                <Search size={18} className="absolute top-1.5 right-3 text-zinc-400" />
-              </div>
-            </div>
-          </div>
-          {error && (
-            <div className="text-center text-base mb-4 mt-4 font-semibold text-red-600">
-              {error.message}
-            </div>
-          )}
-          <Separator className="bg-zinc-800 h-0.5 mt-3" />
-        </div>
+        <HeaderChannels
+          memBersList={memBersList}
+          error={error?.message}
+          name={channel?.name || "No name"}
+          handleListMembers={handleListMembers}
+        />
 
         <div className="flex w-full h-full relative overflow-hidden">
           <div className="flex flex-col w-full relative">
@@ -237,27 +246,33 @@ const Channels = () => {
 
                   {/* render mensagens chat */}
                   <div className="mb-8">
-                    {Object.entries(groupedMessages).map(([date, messages]) => (
-                      <div key={date}>
-                        <div className="flex w-full relative my-4">
-                          <div className="z-[99] flex items-center justify-center w-full">
-                            <div className="w-full h-0.5 bg-[#3f4248]"></div>
-                            <span className="flex w-[250px] items-center justify-center text-xs text-zinc-400 px-2">
-                              {date}
-                            </span>
-                            <div className="w-full h-0.5 bg-[#3f4248]"></div>
-                          </div>
-                        </div>
-
-                        <RenderMessagens
-                          allMessages={messages as any}
-                          messagesEndRef={messagesEndRef}
-                          handleDeleteMessage={handleDeleteMessage}
-                          currentUserId={userId!}
-                          server={server!}
-                        />
+                    {isLoading ? (
+                      <div className="w-full text-zinc-400">
+                        <span className="animate-pulse text-center text-base">Carregando menssagens...</span>
                       </div>
-                    ))}
+                    ) : (
+                      Object.entries(groupedMessages).map(([date, messages]) => (
+                        <div key={date}>
+                          <div className="flex w-full relative my-4">
+                            <div className="z-[99] flex items-center justify-center w-full">
+                              <div className="w-full h-0.5 bg-[#3f4248]"></div>
+                              <span className="flex w-[250px] items-center justify-center text-xs text-zinc-400 px-2">
+                                {date}
+                              </span>
+                              <div className="w-full h-0.5 bg-[#3f4248]"></div>
+                            </div>
+                          </div>
+
+                          <RenderMessagens
+                            allMessages={messages as any}
+                            messagesEndRef={messagesEndRef}
+                            handleDeleteMessage={handleDeleteMessage}
+                            currentUserId={userId!}
+                            server={server!}
+                          />
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </ScrollArea>

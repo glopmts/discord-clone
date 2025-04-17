@@ -307,3 +307,40 @@ export async function acceptFriends(userId: string, addressee: string) {
   }
 }
 
+export async function deleteMessageFriends(userId: string, messageId: string) {
+  try {
+    if (!messageId || !userId) {
+      throw new Error("Message ID e User ID são obrigatórios.");
+    }
+
+    const message = await db.messageFriends.findUnique({
+      where: { id: messageId },
+      select: {
+        receivesId: true,
+        sendId: true,
+      },
+    });
+
+    if (!message) {
+      throw new Error("Mensagem não encontrada.");
+    }
+
+    if (message.sendId !== userId) {
+      throw new Error("Sem permissão para deletar esta mensagem.");
+    }
+
+    await db.$transaction([
+      db.messageFriends.delete({
+        where: { id: messageId }
+      })
+    ]);
+
+    return { success: true };
+
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Falha ao deletar mensagem friends");
+  }
+}
