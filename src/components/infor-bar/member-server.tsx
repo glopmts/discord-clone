@@ -91,7 +91,7 @@ const MemberServer = ({ server, currentUserId, handleExpulseMember }: ServerProp
                       </AvatarFallback>
                     </Avatar>
                     <div className="ml-3">
-                      <p className="text-sm text-white truncate line-clamp-1">{member.user?.name || "Usuário"}</p>
+                      <p className="text-sm truncate line-clamp-1">{member.user?.name || "Usuário"}</p>
                       <div className="flex items-center gap-1 text-xs mt-1 text-neutral-400">
                         {getRoleIcon(memberRole, 14)}
                         <span className="capitalize">{memberRole}</span>

@@ -54,7 +54,7 @@ const PendingFriends = ({ userId }: UserIdProps) => {
 
           return (
             <div className="mt-2 p-3" key={pending.id}>
-              <div className="flex justify-between items-center hover:bg-zinc-800/60 rounded-md p-1" onMouseOver={() => setHoverButtons(true)}>
+              <div className="flex justify-between items-center hover:bg-zinc-400/20 dark:hover:bg-zinc-800/60 rounded-md p-1" onMouseOver={() => setHoverButtons(true)}>
                 <div className="flex items-center gap-2.5 cursor-pointer"
                 >
                   <Avatar className={cn("w-9 h-9")}>
@@ -70,7 +70,7 @@ const PendingFriends = ({ userId }: UserIdProps) => {
                   <button
                     disabled={loader}
                     onClick={() => handleCancel(pending.addressee?.clerk_id!)}
-                    className={`rounded-full cursor-pointer p-2 ${hoverButtons ? "bg-zinc-900" : ""} ${loader ? "opacity-75" : ""}`}>
+                    className={`rounded-full cursor-pointer p-2 ${hoverButtons ? "dark:bg-zinc-900 bg-zinc-400" : ""} ${loader ? "opacity-75" : ""}`}>
                     <X size={20} className="text-zinc-400 hover:text-red-500" />
                   </button>
                 </div>

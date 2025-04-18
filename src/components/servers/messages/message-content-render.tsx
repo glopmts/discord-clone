@@ -121,11 +121,11 @@ const RenderMessagens: FC<MessagePropsRender> = ({
                     {timeText}
                   </span>
                 </div>
-                <p className="text-zinc-300">{normalizedMsg.content}</p>
+                <p className="dark:text-zinc-300 text-black">{normalizedMsg.content}</p>
 
                 {/* Menu que aparece ao passar o mouse */}
                 {(hoveredMessage === msg.id || dropdownOpenForMessage === msg.id) && (
-                  <div className="absolute right-10 h-10 top-0 flex gap-2 bg-zinc-800 border p-1 rounded-md">
+                  <div className="absolute right-10 h-10 top-0 flex gap-2 bg-background shadow-2xs dark:bg-zinc-800 border p-1 rounded-md">
                     <div className="flex items-center gap-1">
                       <div className="flex items-end gap-1.5">
                         {emojis.map((em) => (
@@ -235,7 +235,7 @@ const MenuOptions: FC<MenuOptionsProps> = ({
           <EllipsisIcon size={20} className="text-zinc-400" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className={cn("bg-zinc-800 border z-[800] absolute right-0 -top-20")}>
+      <DropdownMenuContent className={cn("dark:bg-zinc-800 border z-[800] absolute right-0 -top-20")}>
         <DropdownMenuLabel className="gap-2.5 flex">
           {emojis.map((em) => (
             <Button variant="outline" key={em.id}>
@@ -248,7 +248,7 @@ const MenuOptions: FC<MenuOptionsProps> = ({
           {menuOptions.map((opt) => (
             <Button key={opt.id}
               onClick={() => opt.onchage(messageId)}
-              className={`w-full flex items-center cursor-pointer shadow-none justify-between bg-zinc-800 text-white hover:bg-zinc-700/30 ${opt.type === "delete" ? "text-red-500" : ""}`}>
+              className={`w-full flex items-center cursor-pointer shadow-none justify-between dark:bg-zinc-800 bg-background text-black dark:text-white hover:bg-zinc-700/30 ${opt.type === "delete" ? "text-red-500" : ""}`}>
               {opt.label}
               <opt.icon />
             </Button>

@@ -91,6 +91,8 @@ export interface InterfacesRender {
   userId: string;
 
   handleNewsChannel: (categoryId?: string) => void;
+  handleDeleteChannel: (channelId: string) => Promise<void>;
+  handleEditChannel: (channelId?: string) => void;
   handleNewsCategory: () => void;
   handleServerClick: (id: string) => void;
   handleEdite: () => void;

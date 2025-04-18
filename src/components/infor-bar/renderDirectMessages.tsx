@@ -39,7 +39,7 @@ const RenderDirectMessages = ({
   return (
     <>
       <div className="w-full">
-        <Button className="w-full border h-8 bg-zinc-900 text-white hover:bg-zinc-800">
+        <Button className="w-full border h-8 dark:bg-zinc-900 bg-background hover:bg-zinc-400/20 dark:hover:bg-zinc-800">
           <span className="text-zinc-400 text-sm">Encontre ou comece uma conversa</span>
         </Button>
       </div>
@@ -54,7 +54,7 @@ const RenderDirectMessages = ({
               className={cn(`w-full justify-start rounded-md cursor-pointer flex items-center gap-1.5`)}
             >
               {c.icon}
-              <span className={pathname === c.active ? "font-semibold text-white" : "font-semibold text-neutral-400"}>
+              <span className={pathname === c.active ? "font-semibold" : "font-semibold text-neutral-400"}>
                 {c.label}
               </span>
             </Button>
@@ -64,7 +64,7 @@ const RenderDirectMessages = ({
       <Separator className="mt-1" />
       <div className="mt-4 p-2 w-full">
         <div className="flex items-center justify-between w-full p-1">
-          <span className="text-neutral-400 text-sm hover:text-white">Menssagens diretas</span>
+          <span className="text-neutral-400 text-sm hover:text-black dark:hover:text-zinc-200">Menssagens diretas</span>
           <button className="cursor-pointer">
             <span className="text-neutral-400">+</span>
           </button>

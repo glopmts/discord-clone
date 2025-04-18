@@ -10,11 +10,13 @@ import { useQuery } from "@tanstack/react-query"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
+import ContextMenuGlobe from "../ContextMenu"
 import RenderDirectMessages from "../infor-bar/renderDirectMessages"
 import { renderModalContent } from "../infor-bar/renderModalContent"
+import ConviteUserServer from "../modals/convite-users-server"
 import GenericModal from "../modals/GenericModal"
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu"
 import { Skeleton } from "../ui/skeleton"
+import { useMenuModalHandler } from "../useMenuModalHandler"
 import MenuOptionsInfor from "./dropdown-menu-options"
 import { MenuItemsInforServer } from "./menu-items-infor-server"
 import RenderServerChannels from "./renderServerChannels"
@@ -25,7 +27,15 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
   const id = searchParams.get("id");
   const router = useRouter();
   const currentChannelId = searchParams.get("chaId");
+
   const [loader, setLoader] = useState(false);
+  const [modalConviter, setModalConviter] = useState(false);
+
+  const [selectedServer, setSelectedServer] = useState<{
+    id: string;
+    name: string;
+    inviteCode: string;
+  } | null>(null);
 
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -36,6 +46,8 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     isOpen: false,
     variant: null,
   });
+
+  const { setContextMenuOpen, withMenuHandler } = useMenuModalHandler();
 
   const [formData, setFormData] = useState<{
     name: string;
@@ -91,7 +103,6 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     router.push(`/channels/?id=${id}&chaId=${channelId}`)
   };
 
-
   const handleNewsChannel = (categoryId?: string) => {
     setModalState({
       isOpen: true,
@@ -113,7 +124,6 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     });
     setFormData({
       name: "",
-
     });
   };
 
@@ -214,45 +224,82 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     }
   };
 
-  return (
-    <>
-      <ContextMenu>
-        <ContextMenuTrigger>
-          <div className="w-[290px] z-[500] h-full border rounded-l-md flex flex-col">
-            {error && (
-              <div className="text-center text-base font-semibold text-red-500">
-                {error.message}
-              </div>
-            )}
-            <div className="w-full p-2 flex flex-col">
-              {isLoading ? (
-                <div className="space-y-2 p-4">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-6 w-full" />
-                  <Skeleton className="h-6 w-full" />
-                  <Skeleton className="h-6 w-1/2" />
-                </div>
-              ) : server ? (
-                <>
-                  <div className="p-3 flex items-center justify-between">
-                    <MenuOptionsInfor
-                      name={server.name}
-                      handleNewsCategory={handleNewsCategory}
-                      handleNewsChannel={handleNewsChannel}
-                    />
-                  </div>
-                  <div className="w-full h-[72vh] overflow-y-auto scroll-style">
-                    <RenderServerChannels
-                      server={server}
-                      userId={userId}
-                      currentChannelId={currentChannelId!}
-                      handleNewsChannel={handleNewsChannel}
-                      handleNewsCategory={handleNewsCategory}
-                      handleServerClick={handleChannelClick}
-                      handleDelete={handleDeleteCategory}
-                      handleEdite={() => { }}
-                    />
+  const handleConviteServer = (server: {
+    id: string;
+    name: string;
+    inviteCode: string;
+  }) => {
+    setSelectedServer(server);
+    setModalConviter(true);
+  };
 
+
+  return (
+    <div>
+      <ContextMenuGlobe
+        // Ensures the menu closes properly without freezing the screen
+        onOpenChange={(open) => {
+          setContextMenuOpen(open ? id : null);
+        }}
+        className="w-auto"
+        menuItems={[
+          {
+            label: "Convidar pessoas",
+            action: () => withMenuHandler(() => handleConviteServer({
+              id: id!,
+              inviteCode: server?.inviteCode!,
+              name: server?.name || "Server"
+            })),
+          },
+          {
+            label: "Criar um canal",
+            action: () => withMenuHandler(() => handleNewsChannel())
+          },
+          {
+            label: "Criar categoria",
+            action: () => withMenuHandler(() => handleNewsCategory()),
+          }
+        ]}>
+        <div className="w-[290px] z-[500] h-full border rounded-l-md flex flex-col">
+          {error && (
+            <div className="text-center text-base font-semibold text-red-500">
+              {error.message}
+            </div>
+          )}
+          <div className="w-full p-2 flex flex-col">
+            {isLoading ? (
+              <div className="space-y-2 p-4">
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-1/2" />
+              </div>
+            ) : server ? (
+              <>
+                <div className="p-3 flex items-center justify-between">
+                  <MenuOptionsInfor
+                    name={server.name}
+                    handleNewsCategory={handleNewsCategory}
+                    handleNewsChannel={handleNewsChannel}
+                  />
+                </div>
+                <div className="w-full h-[72vh] overflow-y-auto scroll-style">
+                  {/* Render channels that belong to a category */}
+                  <RenderServerChannels
+                    server={server}
+                    userId={userId}
+                    currentChannelId={currentChannelId!}
+                    handleNewsChannel={handleNewsChannel}
+                    handleNewsCategory={handleNewsCategory}
+                    handleServerClick={handleChannelClick}
+                    handleDelete={handleDeleteCategory}
+                    handleEdite={() => { }}
+                    handleDeleteChannel={handleDeleteChannel}
+                    handleEditChannel={handleEditChannel}
+                  />
+
+                  <div className="flex flex-col gap-1.5">
+                    {/* Render channels that do not belong to any category */}
                     {server.channels
                       .filter(channel => !channel.categoryId)
                       .map((channel) => (
@@ -271,35 +318,23 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
                         />
                       ))}
                   </div>
-                </>
-              ) : (
-                loaderMessages ? (
-                  <div className="w-full flex items-center gap-1.5">
-                    <div className="">
-                      <Skeleton className="w-9 h-9 rounded-full" />
-                    </div>
-                    <Skeleton className="w-full h-4 rounded-md" />
+                </div>
+              </>
+            ) : (
+              loaderMessages ? (
+                <div className="w-full flex items-center gap-1.5">
+                  <div className="">
+                    <Skeleton className="w-9 h-9 rounded-full" />
                   </div>
-                ) : (
-                  <RenderDirectMessages messages={messages as any} />
-                )
-              )}
-            </div>
+                  <Skeleton className="w-full h-4 rounded-md" />
+                </div>
+              ) : (
+                <RenderDirectMessages messages={messages as any} />
+              )
+            )}
           </div>
-        </ContextMenuTrigger>
-        {server && (
-          <ContextMenuContent>
-            <>
-              <ContextMenuItem>Criar um canal</ContextMenuItem>
-              <ContextMenuItem>Criar categoria</ContextMenuItem>
-              <ContextMenuItem>Convidar pessoas</ContextMenuItem>
-            </>
-          </ContextMenuContent>
-        )}
-      </ContextMenu>
-
-
-      {/* modal functions options server */}
+        </div>
+      </ContextMenuGlobe>
 
       <GenericModal
         isOpen={modalState.isOpen}
@@ -326,7 +361,14 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
           formData
         })}
       </GenericModal>
-    </>
+
+      <ConviteUserServer
+        isOpen={modalConviter}
+        serverName={selectedServer?.name || ""}
+        serverConvite={selectedServer?.inviteCode || ""}
+        onClose={() => setModalConviter(false)}
+      />
+    </div>
   )
 }
 

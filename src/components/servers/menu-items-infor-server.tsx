@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import ContextMenuGlobe from "../ContextMenu";
 import { channelIcons } from "../icons/IconsChannels";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 
 interface MenuItemsInforServerProps {
   userId: string;
@@ -16,7 +17,8 @@ interface MenuItemsInforServerProps {
   channelType: keyof typeof channelIcons;
   channelName: string;
   children?: ReactNode;
-  server: any
+  server: any;
+  hasUnreadMessages?: boolean;
 }
 
 export const MenuItemsInforServer = ({
@@ -30,7 +32,8 @@ export const MenuItemsInforServer = ({
   channelType,
   channelName,
   children,
-  server
+  server,
+  hasUnreadMessages
 }: MenuItemsInforServerProps) => {
   const [menuItems, setMenuItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -68,19 +71,29 @@ export const MenuItemsInforServer = ({
     loadMenuItems();
   }, [userId, serverId, channelId]);
 
-  if (isLoading) return <div className="text-xs text-zinc-500 animate-pulse">Carregando...</div>;
+  if (isLoading)
+    return (
+      <div className="flex flex-col gap-3">
+        <Skeleton className="w-full h-5" />
+      </div>
+    );
 
   return (
     <ContextMenuGlobe menuItems={menuItems}>
       {children || (
-        <Button
-          variant={currentChannelId === channelId ? "secondary" : "ghost"}
-          onClick={() => onServerClick(channelId)}
-          className="w-full justify-start px-3 py-1 text-neutral-400 hover:text-white hover:bg-zinc-700/50 rounded-sm"
-        >
-          {channelIcons[channelType]}
-          <span className="truncate">{channelName}</span>
-        </Button>
+        <div className="relative">
+          {hasUnreadMessages && (
+            <div className="absolute z-20 w-1 h-2 top-3 dark:bg-white text-zinc-600 rounded-r-full transition-all" />
+          )}
+          <Button
+            variant={currentChannelId === channelId ? "secondary" : "ghost"}
+            onClick={() => onServerClick(channelId)}
+            className="w-full relative justify-start px-3 py-1 hover:text-zinc-500 dark:text-neutral-400 dark:hover:text-white dark:hover:bg-zinc-700/50 rounded-sm"
+          >
+            {channelIcons[channelType]}
+            <span className="truncate">{channelName}</span>
+          </Button>
+        </div>
       )}
     </ContextMenuGlobe>
   );

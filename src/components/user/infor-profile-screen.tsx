@@ -22,7 +22,7 @@ const InfoItem = ({ label, value }: InfoItemProps) => (
       <span className="font-medium">{label}</span>
       <span>{value}</span>
     </div>
-    <button className="px-3 py-1 rounded-md bg-zinc-800 cursor-pointer hover:bg-zinc-600/30 transition-colors">
+    <button className="px-3 py-1 rounded-md border border-black dark:border-zinc-600 bg-neutral-300 dark:bg-zinc-800 cursor-pointer hover:bg-zinc-600/30 transition-colors">
       Editar
     </button>
   </div>
@@ -32,7 +32,7 @@ const ActionButton = ({
   children,
   variant = "primary",
 }: { children: React.ReactNode; variant?: "primary" | "default" }) => (
-  <button className={`p-1 rounded-md px-2 w-auto ${variant === "primary" ? "bg-[#4957f0]" : "bg-[#505df0]"}`}>
+  <button className={`p-1 rounded-md px-2 text-white w-auto ${variant === "primary" ? "bg-[#4957f0]" : "bg-[#505df0]"}`}>
     <span className="font-base text-sm">{children}</span>
   </button>
 )
@@ -65,10 +65,10 @@ export const InforPerfil = ({ user, isOnline }: UserInfoProps) => {
         <div className="w-full z-50 h-20 bg-[#537BA2] relative"></div>
 
         {/* Profile Content */}
-        <div className="z-[630] relative p-3 bg-zinc-950 rounded-b-md">
+        <div className="z-[630] relative p-3 bg-stone-100 dark:bg-zinc-950 rounded-b-md">
           {/* Avatar and User Info */}
           <div className="flex items-baseline gap-2 -top-6 relative w-full">
-            <div className="w-20 h-18 relative border-4 bg-zinc-950 border-zinc-900 rounded-full p-1">
+            <div className="w-20 h-18 relative border-4 bg-stone-100 dark:bg-zinc-950 border-zinc-900 rounded-full p-1">
               {user.image ? (
                 <Image
                   src={user.image || "/placeholder.svg"}
@@ -78,13 +78,13 @@ export const InforPerfil = ({ user, isOnline }: UserInfoProps) => {
                 />
               ) : (
                 <div className="w-full h-full items-center justify-center">
-                  <div className="w-full h-full flex items-center justify-center rounded-full bg-zinc-800 text-center">
+                  <div className="w-full h-full flex items-center justify-center rounded-full bg-neutral-500 dark:bg-zinc-800 text-center">
                     <span>{userInitial}</span>
                   </div>
                 </div>
               )}
               <div
-                className={`absolute bottom-0 right-0 ${isOnline ? "bg-green-500" : "bg-zinc-800"
+                className={`absolute bottom-0 right-0 ${isOnline ? "bg-green-500" : "bg-neutral-500 dark:bg-zinc-800"
                   } border-2 border-zinc-900 p-2 rounded-full`}
                 aria-label={isOnline ? "Online" : "Offline"}
               />
@@ -93,7 +93,7 @@ export const InforPerfil = ({ user, isOnline }: UserInfoProps) => {
             <div className="flex w-full items-start justify-between">
               <div className="flex flex-col gap-2.5">
                 <h1 className="font-semibold text-xl">{user.name}</h1>
-                <div className="w-7 h-7 flex items-center justify-center rounded-md bg-zinc-800">
+                <div className="w-7 h-7 flex items-center justify-center rounded-md bg-neutral-500 dark:bg-zinc-800">
                   <div className="w-4 h-4 text-center flex items-center justify-center rounded-full bg-green-400">
                     <span className="text-black">#</span>
                   </div>
@@ -107,7 +107,7 @@ export const InforPerfil = ({ user, isOnline }: UserInfoProps) => {
 
           {/* User Information Card */}
           <div className="mt-3 w-full">
-            <div className="bg-[#1A1A1E] w-full rounded-md p-3 flex flex-col gap-2.5">
+            <div className="dark:bg-[#1A1A1E] bg-neutral-300 w-full rounded-md p-3 flex flex-col gap-2.5">
               <InfoItem label="Nome Exibido" value={user.name || ""} />
               <InfoItem label="Nome De Usuário" value={user.username || ""} />
               <InfoItem label="E-Mail" value={user.email || ""} />

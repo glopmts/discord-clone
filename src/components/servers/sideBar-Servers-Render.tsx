@@ -76,7 +76,7 @@ const RenderSideBarServer = ({
 
                         <div
                           className={cn(
-                            "absolute -left-3 w-1 h-10 bg-white rounded-r-full transition-all",
+                            "absolute -left-3 w-1 h-10 dark:bg-white bg-zinc-600 rounded-r-full transition-all",
                             isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100 group-hover:h-5"
                           )}
                         />
@@ -98,7 +98,8 @@ const RenderSideBarServer = ({
                         </div>
                       </div>
                     </TooltipTrigger>
-                    <TooltipContent side="right" className="bg-zinc-800 border text-white rounded-md p-2 px-4">
+                    <TooltipContent side="right"
+                    >
                       <p>{server.name}</p>
                     </TooltipContent>
                   </Tooltip>

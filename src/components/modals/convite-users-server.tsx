@@ -40,7 +40,7 @@ const ConviteUserServer = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={cn("bg-[#242429] text-white border")}>
+      <DialogContent className={cn("dark:bg-[#242429] bg-background border")}>
         <DialogHeader>
           <DialogTitle>Convidar amigos para {serverName}</DialogTitle>
         </DialogHeader>

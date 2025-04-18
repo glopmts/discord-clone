@@ -220,10 +220,10 @@ const ChatFriends = () => {
   }
 
   return (
-    <div className="w-full h-full overflow-hidden bg-[#1A1A1E] text-gray-100">
+    <div className="w-full h-full overflow-hidden dark:bg-[#1A1A1E] bg-background text-gray-100">
       {/* Header */}
-      <div className="w-full sticky top-0 z-50 bg-[#1A1A1E] shadow-sm">
-        <div className="flex justify-between items-center px-4 py-2 border-b border-[#1e1f22] w-full">
+      <div className="w-full sticky top-0 z-50 dark:bg-[#1A1A1E] bg-background shadow-sm">
+        <div className="flex justify-between items-center px-4 py-2 border-b border-zinc-400 dark:border-[#1e1f22] w-full">
           <div className="flex items-center gap-2">
             <Avatar className="w-8 h-8 rounded-full">
               <AvatarImage src={friends?.image!} alt={friends?.username!} />
@@ -232,7 +232,7 @@ const ChatFriends = () => {
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="font-semibold text-base text-gray-100">{friends?.name}</span>
+              <span className="font-semibold text-zinc-700 text-base dark:text-gray-100">{friends?.name}</span>
               <span className="text-xs text-gray-400">{friends?.isOnline || "Offline"}</span>
             </div>
           </div>
@@ -242,13 +242,13 @@ const ChatFriends = () => {
                 onVoiceCall={handleVoiceCall}
                 onVideoCall={handleVideoCall}
                 onUserInfo={handleMenuInfor}
-                className="text-gray-400 hover:text-gray-200"
+                className="text-gray-400 dark:hover:text-gray-200"
               />
             </div>
             <div className="w-[180px] relative">
               <Input
                 placeholder="Buscar..."
-                className="w-full h-8 bg-[#1e1f22] text-sm border-none focus-visible:ring-0 text-gray-200 placeholder:text-gray-400"
+                className="w-full h-8 dark:bg-[#1e1f22] bg-zinc-400/30 text-sm border-none focus-visible:ring-0 text-gray-200 placeholder:text-gray-400"
               />
               <Search size={16} className="absolute top-2 right-2.5 text-gray-400" />
             </div>
@@ -268,7 +268,7 @@ const ChatFriends = () => {
               <div className="flex flex-col gap-4  pb-8">
                 {/* Friend Profile */}
                 <div className="mt-4 flex flex-col">
-                  <Avatar className="w-20 h-20 bg-[#1e1f22] p-0.5 rounded-full border-4 border-[#1e1f22]">
+                  <Avatar className="w-20 h-20 dark:bg-[#1e1f22] bg-zinc-400/30 p-0.5 rounded-full border-4 border-zinc-400 dark:border-[#1e1f22]">
                     <AvatarImage className="rounded-full object-cover" src={friends?.image!} alt={friends?.username!} />
                     <AvatarFallback className="bg-[#5865f2] text-white">
                       {friends?.username?.charAt(0).toUpperCase()}
@@ -280,7 +280,7 @@ const ChatFriends = () => {
                   </div>
                   <div className="flex items-center gap-1 text-gray-400 mt-4 text-center">
                     <span>Este é o começo do seu histórico de mensagens diretas com</span>
-                    <span className="font-semibold text-gray-200">{friends?.name}.</span>
+                    <span className="font-semibold dark:text-gray-200">{friends?.name}.</span>
                   </div>
                 </div>
 
@@ -342,7 +342,7 @@ const ChatFriends = () => {
           </div>
 
           {/* Message Input */}
-          <div className="sticky bottom-3 bg-[#1A1A1E] p-4 pt-0">
+          <div className="sticky bottom-3 dark:bg-[#1A1A1E] bg-background p-4 pt-0">
             <InputMenssagens
               name={friends?.name || "user"}
               messageInput={messageInput}
@@ -354,10 +354,10 @@ const ChatFriends = () => {
 
         {/* User Info Panel */}
         {isOpen && (
-          <div className="w-[350px] h-full bg-[#2b2d31] border-l border-[#1e1f22] flex-shrink-0 overflow-y-auto">
+          <div className="w-[350px] h-full bg-zinc-400/20 dark:bg-[#2b2d31] border-l border-zinc-400 dark:border-[#1e1f22] flex-shrink-0 overflow-y-auto">
             <div className="w-full h-32 bg-[#5865f2] relative"></div>
             <div className="absolute top-2 right-2">
-              <Button className="bg-[#1e1f22]/80 w-8 h-8 rounded-full text-white hover:bg-[#1e1f22] cursor-pointer">
+              <Button className="dark:bg-[#1e1f22] bg-zinc-400/30/80 w-8 h-8 rounded-full hover:dark:bg-[#1e1f22] bg-zinc-400/30 cursor-pointer">
                 <UserCheck size={18} />
               </Button>
             </div>
@@ -370,29 +370,29 @@ const ChatFriends = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col items-center mt-3">
-                  <span className="text-lg font-semibold">{friends?.name}</span>
-                  <span className="text-sm text-gray-400">@{friends?.username}</span>
+                  <span className="text-lg font-semibold text-black dark:text-white">{friends?.name}</span>
+                  <span className="text-sm dark:text-gray-400 text-zinc-500">@{friends?.username}</span>
                 </div>
               </div>
 
-              <div className="mt-6 bg-[#1e1f22] rounded-lg p-4">
-                <h3 className="text-xs font-semibold text-gray-400 mb-2">SOBRE MIM</h3>
-                <p className="text-sm text-gray-200">
+              <div className="mt-6 dark:bg-[#1e1f22] bg-zinc-400/30 rounded-lg p-4">
+                <h3 className="text-xs font-semibold dark:text-gray-400 text-zinc-500 mb-2">SOBRE MIM</h3>
+                <p className="text-sm dark:text-gray-200 text-zinc-600">
                   {friends?.description || "Nenhuma descrição fornecida."}
                 </p>
 
                 <div className="mt-6 pt-4 border-t border-[#3f4248]">
-                  <h3 className="text-xs font-semibold text-gray-400 mb-2">INFORMAÇÕES</h3>
+                  <h3 className="text-xs font-semibold dark:text-gray-400 text-zinc-500 mb-2">INFORMAÇÕES</h3>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-xs text-gray-400">Membro desde</p>
-                      <p className="text-sm text-gray-200">
+                      <p className="text-xs dark:text-gray-400 text-zinc-500">Membro desde</p>
+                      <p className="text-sm dark:text-gray-200 text-zinc-600">
                         {formatDateComplete(new Date(friends?.createdAt || ""))}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400">?.isOnline</p>
-                      <p className="text-sm text-gray-200">
+                      <p className="text-xs dark:text-gray-400 text-zinc-500">?.isOnline</p>
+                      <p className="text-sm dark:text-gray-200 text-zinc-600">
                         {friends?.isOnline || "Offline"}
                       </p>
                     </div>

@@ -8,7 +8,7 @@ import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
 import ModalUserDetails from "./details-user-modal"
-import InterfacePageConfigs from "./details-user-page"
+import InterfacePageConfigs from "./Details-User-Screen"
 import { AlertEditeProfile } from "./modal-edite-profile"
 
 const ProfileHeader = ({ userId }: UserIdProps) => {
@@ -55,7 +55,7 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
   return (
     <>
       <div className="relative">
-        <div className="w-[345px] h-[58px] bg-[#1a1a1d] z-50 bottom-0 left-3 mb-2 border absolute rounded-[0.4rem] border-zinc-800">
+        <div className="w-[345px] h-[58px] bg-background dark:bg-[#1a1a1d] z-50 bottom-0 left-3 mb-2 border absolute rounded-[0.4rem] dark:border-zinc-800">
           {isLoading ? (
             <div className="w-full h-full flex items-center justify-center">
               <Loader size={20} className="animate-spin" />
@@ -73,18 +73,18 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
                   <div className={`absolute bottom-0 top-5 right-0 ${isOnline ? "bg-green-500" : "bg-zinc-600"} border-2 border-zinc-900 p-1.5 rounded-full`}></div>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium text-white">{user?.name}</span>
-                  <span className="text-xs text-zinc-400">Disponível</span>
+                  <span className="text-sm font-medium">{user?.name}</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">Disponível</span>
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <Button variant={isMic ? 'ghost' : 'micOffIcon'} onClick={handleMic} className="text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer">
+                <Button variant={isMic ? 'ghost' : 'micOffIcon'} onClick={handleMic} className="text-zinc-500 dark:text-zinc-400 hover:text-white hover:bg-zinc-400 dark:hover:bg-zinc-800 cursor-pointer">
                   {isMic ? <Mic size={28} /> : <MicOffIcon color="red" size={28} />}
                 </Button>
-                <Button variant={isHeadphone ? 'ghost' : 'micOffIcon'} onClick={handHeadphone} className="text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer">
+                <Button variant={isHeadphone ? 'ghost' : 'micOffIcon'} onClick={handHeadphone} className="text-zinc-500 dark:text-zinc-400 hover:text-white hover:bg-zinc-400 dark:hover:bg-zinc-800 cursor-pointer">
                   {isHeadphone ? <HeadphonesIcon size={28} /> : <HeadphoneOff color="red" size={28} />}
                 </Button>
-                <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer" onClick={handleFullScreen}>
+                <Button variant="ghost" className="text-zinc-500 dark:text-zinc-400 hover:text-white hover:bg-zinc-400 dark:hover:bg-zinc-800 cursor-pointer" onClick={handleFullScreen}>
                   <Settings size={28} />
                 </Button>
               </div>

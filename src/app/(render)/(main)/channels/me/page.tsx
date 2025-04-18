@@ -37,12 +37,12 @@ const Me = () => {
 
   return (
     <div className="flex w-full h-full">
-      <div className="flex-1 w-full h-full flex flex-col bg-zinc-900">
-        <div className="w-full flex items-center justify-between text-zinc-400 border-b px-6 p-3">
+      <div className="flex-1 w-full h-full flex flex-col dark:bg-zinc-900 bg-background">
+        <div className="w-full flex items-center justify-between dark:text-zinc-400 border-b px-6 p-3">
           <div className="flex items-center gap-2.5">
             <div className="flex items-center gap-3">
               <Users size={20} />
-              <span className="text-white">Amigos</span>
+              <span className="">Amigos</span>
               <div className="w-1 h-1 bg-zinc-600 rounded-full"></div>
               <div className="flex items-center gap-2 cursor-pointer">
                 {buttons.map((btn) => (
@@ -53,7 +53,7 @@ const Me = () => {
                       btn.onChange()
                     }}
                     variant={btn.type === 'news' ? "discord" : "ghost"}
-                    className={`${tabs === btn.id ? "bg-zinc-800/40 border" : ""}`}>
+                    className={`${tabs === btn.id ? "dark:bg-zinc-800/40 shadow border" : ""}`}>
                     {btn.label}
                   </Button>
                 ))}
@@ -72,7 +72,7 @@ const Me = () => {
           <PendingFriends userId={userId!} />
         ) : null}
       </div>
-      <div className="w-[360px] border-l bg-[#212125]">
+      <div className="w-[360px] border-l dark:bg-[#212125] bg-zinc-100">
         <div className="p-3 mt-2.5">
           <h1 className="text-[1.2rem] font-semibold">Ativo agora</h1>
           <div className="flex items-center justify-center flex-col mt-3 p-4">

@@ -73,7 +73,7 @@ export default function MenuOptionsInfor({
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger className="flex items-center justify-between w-full cursor-pointer">
-        <span className="font-semibold text-white truncate">{name}</span>
+        <span className="font-semibold  truncate">{name}</span>
         <LucideArrowBigDown size={20} className="text-zinc-500" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className={cn("w-[14rem]")}>

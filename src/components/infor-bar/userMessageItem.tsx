@@ -12,7 +12,7 @@ const UserMessageItem = ({ user }: { user: UserProps }) => {
     <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="w-full flex justify-between items-center gap-2 h-10 hover:bg-zinc-900 rounded-md transition-all p-1"
+      className="w-full flex justify-between items-center gap-2 h-10 hover:opacity-55 hover:bg-zinc-400/20 dark:hover:bg-zinc-900 rounded-md transition-all p-1"
       key={user.clerk_id}
     >
       <Link href={`/channels/me/${user.id}`} className="w-full"
@@ -28,7 +28,7 @@ const UserMessageItem = ({ user }: { user: UserProps }) => {
           </div>
 
           <div className="flex flex-col items-start overflow-hidden">
-            <span className={`text-sm font-medium  truncate w-full ${mouseHover ? "text-white" : "text-zinc-400"}`}>
+            <span className={`text-sm font-medium  truncate w-full ${mouseHover ? "dark:text-white" : "text-zinc-500"}`}>
               {user.name}
             </span>
           </div>

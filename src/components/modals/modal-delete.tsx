@@ -35,7 +35,7 @@ const ModalGlobalDelete: FC<ModalProps> = ({
       onOpenChange={(open) => {
         if (!open) onClose();
       }}>
-      <AlertDialogContent className={cn("bg-[#242429]")}>
+      <AlertDialogContent className={cn("dark:bg-[#242429] bg-background")}>
         <AlertDialogHeader>
           <AlertDialogTitle>Excluir {title}</AlertDialogTitle>
           <AlertDialogDescription>

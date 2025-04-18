@@ -48,7 +48,7 @@ export default function StatusBar({ username = "User", userImage, status = "ok" 
   return (
     <div className="w-full max-w-2xl">
       <div className="flex gap-4 items-start">
-        <div className="w-16 h-16 relative border-4 bg-zinc-950 border-zinc-800 rounded-full p-1 flex-shrink-0">
+        <div className="w-16 h-16 relative border-4 dark:bg-zinc-950 border-zinc-800 rounded-full p-1 flex-shrink-0">
           {userImage ? (
             <Image src={userImage || "/placeholder.svg"} alt={username} fill className="object-cover rounded-full" />
           ) : (
@@ -60,11 +60,11 @@ export default function StatusBar({ username = "User", userImage, status = "ok" 
 
         <div className="flex flex-col gap-2 w-full">
           <div className="flex items-center gap-1">
-            <h2 className="text-white text-lg">Sua conta está</h2>
+            <h2 className="text-lg">Sua conta está</h2>
             <span className="text-lg font-semibold text-[#40A258]">toda em ordem</span>
           </div>
 
-          <div className="text-sm text-gray-300">
+          <div className="text-sm text-gray-600 dark:text-gray-300">
             Obrigado por respeitar os{" "}
             <Link href="#" className="text-blue-500 hover:underline">
               Termos de Serviço

@@ -48,7 +48,7 @@ const ModalInfor = ({
   return (
     <div
       ref={modalRef}
-      className={`w-[240px] h-[148px] bg-zinc-800 border absolute right-10 rounded-md z-[1100] ${className}`}
+      className={`w-[240px] h-[148px] dark:bg-zinc-800 bg-background border absolute right-10 rounded-md z-[1100] ${className}`}
     >
       <div className="w-full p-2 flex flex-col gap-1.5">
         {title && (

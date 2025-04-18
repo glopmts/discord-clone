@@ -112,7 +112,7 @@ const DetailsMembers = ({
   const getStatusButton = () => {
     if (isLoadingStatus) {
       return (
-        <Button disabled className="rounded-full w-8 h-8 bg-zinc-800/60">
+        <Button disabled className="rounded-full w-8 h-8 bg-background dark:bg-zinc-800/60">
           <Loader size={16} className="animate-spin" />
         </Button>
       );
@@ -147,7 +147,7 @@ const DetailsMembers = ({
         return (
           <Button
             onClick={handleAddFriend}
-            className="rounded-full w-8 h-8 bg-zinc-800/60 hover:bg-zinc-700/30 text-white"
+            className="rounded-full w-8 h-8 bg-background dark:bg-zinc-800/60 hover:bg-zinc-700/30 text-white"
             disabled={addFriendMutation.isPending}
           >
             {addFriendMutation.isPending ? (
@@ -162,7 +162,7 @@ const DetailsMembers = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={cn("p-0 overflow-hidden z-[200] bg-zinc-800 w-[400px]")}>
+      <DialogContent className={cn("p-0 overflow-hidden z-[200] bg-background dark:bg-zinc-800 w-[400px]")}>
         <DialogTitle className="hidden"></DialogTitle>
         <div className="w-full">
           {error && (
@@ -197,7 +197,7 @@ const DetailsMembers = ({
                           <h3 className="font-semibold text-xl">{member?.name}</h3>
                           {getRoleIcon(getMemberRole(member?.MemberCargo ?? []), 18)}
                         </div>
-                        <span className="text-sm text-zinc-400">{member?.username}</span>
+                        <span className="text-sm dark:text-zinc-400 text-zinc-500">{member?.username}</span>
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger>
@@ -224,7 +224,7 @@ const DetailsMembers = ({
                       </DropdownMenu>
                     </div>
                     {friendshipStatus && (
-                      <span className="text-xs mt-1 text-zinc-400">
+                      <span className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">
                         Status: {friendshipStatus === "PENDING" ? "Pedido pendente" :
                           friendshipStatus === "FRIENDS" ? "Amigos" :
                             "Bloqueado"}

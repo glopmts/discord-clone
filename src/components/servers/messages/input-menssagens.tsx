@@ -21,10 +21,10 @@ const InputMenssagens = ({
 }: MessagePropsInput) => {
   return (
     <div className={cn("w-full", className)}>
-      <div className="bg-[#222327] w-full border rounded-lg">
-        <div className="flex items-center w-full justify-between bg-[#222327] p-1.5 px-4 rounded-md">
+      <div className="dark:bg-[#222327] bg-zinc-300/30 w-full border rounded-lg">
+        <div className="flex items-center w-full justify-between dark:bg-[#222327] bg-zinc-300/30 p-1.5 px-4 rounded-md">
           <div className="flex items-center w-full">
-            <div className="mr-4 text-zinc-400 hover:text-zinc-200 cursor-pointer">
+            <div className="mr-4 text-zinc-400 dark:hover:text-zinc-200 hover:opacity-55 cursor-pointer">
               <PlusCircle size={20} />
             </div>
             <Input
@@ -43,9 +43,9 @@ const InputMenssagens = ({
             />
           </div>
           <div className="ml-4 text-zinc-400 flex items-center gap-3">
-            <Gift size={20} className="hover:text-zinc-200 cursor-pointer" />
-            <Sticker size={20} className="hover:text-zinc-200 cursor-pointer" />
-            <Laugh size={20} className="hover:text-zinc-200 cursor-pointer" />
+            <Gift size={20} className="dark:hover:text-zinc-200 hover:opacity-55 cursor-pointer" />
+            <Sticker size={20} className="dark:hover:text-zinc-200 hover:opacity-55 cursor-pointer" />
+            <Laugh size={20} className="dark:hover:text-zinc-200 hover:opacity-55 cursor-pointer" />
           </div>
         </div>
       </div>

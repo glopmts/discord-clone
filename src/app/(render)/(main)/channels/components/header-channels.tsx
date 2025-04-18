@@ -20,16 +20,16 @@ const HeaderChannels = ({ handleListMembers, memBersList, name, error }: HeaderP
           </div>
         </div>
         <div className="flex items-center gap-3.5">
-          <Bell size={18} className="text-zinc-400 hover:text-zinc-200 cursor-pointer" />
-          <Pin size={18} className="text-zinc-400 hover:text-zinc-200 cursor-pointer" />
+          <Bell size={18} className="text-gray-500 dark:text-zinc-400 hover:text-zinc-200 cursor-pointer" />
+          <Pin size={18} className="text-gray-500 dark:text-zinc-400 hover:text-zinc-200 cursor-pointer" />
           <div className="">
             <button onClick={handleListMembers} className="cursor-pointer hover:bg-zinc-700/20 p-1 rounded-full">
-              <Users size={18} className={memBersList ? "text-white" : "text-zinc-400 hover:text-zinc-200"} />
+              <Users size={18} className={memBersList ? "" : "text-gray-500 dark:text-zinc-400 hover:text-zinc-200"} />
             </button>
           </div>
           <div className="w-[180px] relative ml-4">
-            <Input placeholder="Buscar..." className="relative w-full h-8 bg-[#1e1f22] border-none focus-visible:ring-0" />
-            <Search size={18} className="absolute top-1.5 right-3 text-zinc-400" />
+            <Input placeholder="Buscar..." className="relative w-full h-8 bg-zinc-200 dark:bg-[#1e1f22] border-none focus-visible:ring-0" />
+            <Search size={18} className="absolute top-1.5 right-3 text-gray-500 dark:text-zinc-400" />
           </div>
         </div>
       </div>
@@ -38,7 +38,7 @@ const HeaderChannels = ({ handleListMembers, memBersList, name, error }: HeaderP
           {error}
         </div>
       )}
-      <Separator className="bg-zinc-800 h-0.5 mt-3" />
+      <Separator className="dark:bg-zinc-800 bg-zinc-300 h-0.5 mt-3" />
     </div>
   );
 }

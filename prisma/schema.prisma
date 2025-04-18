@@ -69,6 +69,7 @@ model Category {
   serverId  String
   server    Server    @relation(fields: [serverId], references: [id])
   channels  Channel[]
+  isActive  Boolean   @default(false)
   createdAt DateTime  @default(now())
 }
 

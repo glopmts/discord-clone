@@ -55,7 +55,7 @@ export default function ModalCreateServer({
 
   return (
     <AlertDialog open={isOpen}>
-      <AlertDialogContent className={cn("bg-[#242429] z-[360]")}>
+      <AlertDialogContent className={cn("dark:bg-[#242429] bg-background z-[360]")}>
         <AlertDialogHeader>
           <AlertDialogTitle>Personalizer seu servidor</AlertDialogTitle>
           <AlertDialogDescription>
@@ -75,7 +75,7 @@ export default function ModalCreateServer({
               placeholder="NOME DO SERVIDOR"
               type="text"
               value={form.name}
-              className={cn("bg-zinc-900")}
+              className={cn("dark:bg-zinc-900 bg-zinc-200")}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
           </div>

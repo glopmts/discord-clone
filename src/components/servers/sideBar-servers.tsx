@@ -22,7 +22,7 @@ const SideBarServers = ({ userId }: UserIdProps) => {
   const searchParams = useSearchParams()
   const currentServerId = searchParams.get('id')
   const pathname = usePathname()
-  const isUserPage = pathname === "/channels/me";
+  const isUserPage = pathname === "/channels/me/";
   const [modalCreate, setModalCreate] = useState(false);
   const [modalConviter, setModalConviter] = useState(false);
   const [selectedServer, setSelectedServer] = useState<{
@@ -130,14 +130,14 @@ const SideBarServers = ({ userId }: UserIdProps) => {
                 <TooltipTrigger asChild>
                   <div className="relative group">
                     {isUserPage && (
-                      <div className="absolute -left-3 w-1 h-10 bg-white rounded-r-full transition-all group-hover:h-5" />
+                      <div className="absolute -left-3 w-1 h-10 dark:bg-white bg-zinc-600 rounded-r-full transition-all group-hover:h-5" />
                     )}
-                    <button className={`relative w-9 h-9 rounded-md flex items-center justify-center hover:rounded-2xl transition-all duration-200 cursor-pointer ${isUserPage ? "bg-[#5865f2]" : "bg-zinc-800"}`} onClick={handleUserClick}>
+                    <button className={`relative w-9 h-9 rounded-md flex items-center justify-center hover:rounded-2xl transition-all duration-200 cursor-pointer ${isUserPage ? "bg-[#5865f2]" : "dark:bg-zinc-800 bg-zinc-600"}`} onClick={handleUserClick}>
                       <Image src="/images/discord-white.png" alt="Discord icone" fill className="w-full h-full object-cover" />
                     </button>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="right" className="bg-black text-white border-none rounded-md py-1 px-3">
+                <TooltipContent side="right">
                   <p>Discord</p>
                 </TooltipContent>
               </Tooltip>
@@ -163,12 +163,12 @@ const SideBarServers = ({ userId }: UserIdProps) => {
                   <TooltipTrigger asChild>
                     <button
                       onClick={link.handleCreateServer}
-                      className="w-9 h-9 cursor-pointer rounded-md bg-[#252527] flex items-center justify-center hover:rounded-sm hover:bg-[#5865f2] text-[#f9fdfa] hover:text-white transition-all duration-200"
+                      className="w-9 h-9 cursor-pointer rounded-md dark:bg-[#252527] bg-zinc-600 flex items-center justify-center hover:rounded-sm hover:bg-[#5865f2] text-[#f9fdfa] hover:text-white transition-all duration-200"
                     >
                       {link.icon}
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="bg-black text-white border-none rounded-md py-1 px-3">
+                  <TooltipContent side="right">
                     <p>{link.label}</p>
                   </TooltipContent>
                 </Tooltip>

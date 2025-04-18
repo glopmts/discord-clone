@@ -5,9 +5,10 @@ import { cn } from "@/lib/utils"
 import { User } from "@prisma/client"
 import { Search, X } from "lucide-react"
 import { useState } from "react"
+import { ModeToggle } from "../theme-button"
 import { Separator } from "../ui/separator"
 import { getLinksNavegation } from "./details-props"
-import { InforPerfil } from "./infor-profile"
+import { InforPerfil } from "./infor-profile-screen"
 import StatusBar from "./status-bar"
 
 type ModalConfig = {
@@ -34,14 +35,14 @@ const InterfacePageConfigs = ({ onClose, userId, user, isOnline }: ModalConfig) 
   const linksNavegation = getLinksNavegation({ handlePerfil });
 
   return (
-    <div className="fixed flex items-center inset-0 w-full h-full z-[999] bg-[#202024]">
+    <div className="fixed flex items-center inset-0 w-full h-full bg-background z-[999] dark:bg-[#202024]">
       {/* Sidebar */}
-      <div className="w-[486px] h-full bg-[#121214] border-r border-zinc-800 overflow-y-auto">
+      <div className="w-[486px] h-full dark:bg-[#121214] border-r  bg-background border-zinc-800 overflow-y-auto">
         <div className="p-7 flex flex-col justify-end items-end">
           <div className="relative mb-4 mt-4">
             <Input
               placeholder="Buscar"
-              className="bg-[#1e1f22] border h-8 pl-2 pr-8 text-sm rounded-sm text-zinc-300 placeholder:text-zinc-500 focus-visible:ring-0"
+              className="dark:bg-[#1e1f22] border h-8 pl-2 pr-8 text-sm rounded-sm text-zinc-300 placeholder:text-zinc-500 focus-visible:ring-0"
             />
             <Search size={16} className="text-zinc-400 absolute top-2 bottom-0 right-2" />
           </div>
@@ -67,12 +68,19 @@ const InterfacePageConfigs = ({ onClose, userId, user, isOnline }: ModalConfig) 
                 </button>
               ))}
             </div>
-            <Separator />
+            <Separator className="mt-2" />
+            <div className="mt-3">
+              <h2 className="text-zinc-500 font-medium text-xs mb-2 px-2">CONFIG. DO APLICATIVO</h2>
+              <div className="p-2">
+                <span className="mb-3 text-zinc-400 font-semibold">Aparência</span>
+                <ModeToggle />
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="w-[740px] h-full bg-[#202024] overflow-y-auto p-4">
+      <div className="w-[740px] h-full dark:bg-[#202024]  bg-background overflow-y-auto p-4">
         <div className="p-6">
           <div className="">
             <div className="flex items-start justify-between mb-6">

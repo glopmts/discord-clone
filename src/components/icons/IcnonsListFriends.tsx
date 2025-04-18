@@ -99,7 +99,7 @@ export const IconBar = ({
           key={id}
           onClick={onClick}
           className={`p-2 rounded-full text-zinc-400 cursor-pointer transition-colors relative group ${active
-            ? "bg-zinc-800 text-white"
+            ? "dark:bg-zinc-800 dark:text-white bg-zinc-500/10"
             : ""
             }`}
           aria-label={tooltip}

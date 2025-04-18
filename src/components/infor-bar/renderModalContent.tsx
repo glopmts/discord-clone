@@ -38,14 +38,14 @@ export const renderModalContent = ({ modalState, formData, setFormData }: ModalR
                     typeChannel: channel.type as ChannelTypes
                   }))}
                   className={`flex items-start p-3 rounded cursor-pointer ${formData.typeChannel === channel.type
-                    ? 'bg-zinc-800'
-                    : 'bg-[#1a1a1e] hover:bg-[#2a2a2e]'
+                    ? 'dark:bg-zinc-800 bg-zinc-400/20'
+                    : 'dark:bg-[#1a1a1e] dark:hover:bg-[#2a2a2e] hover:bg-zinc-400/30'
                     }`}
                 >
                   <span className="text-2xl mr-3">{channel.icon}</span>
                   <div>
                     <div className="font-medium">{channel.label}</div>
-                    <div className="text-sm text-gray-400">{channel.description}</div>
+                    <div className="text-sm dark:text-gray-400">{channel.description}</div>
                   </div>
                 </div>
               ))}
@@ -63,7 +63,7 @@ export const renderModalContent = ({ modalState, formData, setFormData }: ModalR
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                className="w-full bg-[#1a1a1e] text-white pl-8 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[#4553BE]"
+                className="w-full dark:bg-[#1a1a1e] pl-8 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[#4553BE]"
                 placeholder="novo-canal"
               />
             </div>
@@ -98,7 +98,7 @@ export const renderModalContent = ({ modalState, formData, setFormData }: ModalR
               type="text"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full bg-[#1a1a1e] text-white py-2 rounded focus:outline-none focus:ring-1 focus:ring-[#4553BE]"
+              className="w-full dark:bg-[#1a1a1e] py-2 rounded focus:outline-none focus:ring-1 focus:ring-[#4553BE]"
               placeholder="nova-categoria"
             />
           </div>

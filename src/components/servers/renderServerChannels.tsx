@@ -1,5 +1,4 @@
 import { getUnreadMessagesCount, markMessagesChannelRead } from "@/app/actions/menssagens"
-import { channelIcons } from "@/components/icons/IconsChannels"
 import { InterfacesRender } from "@/types/interfaces"
 import { Calendar, LucideListMinus, Plus, Users } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -8,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 import { Button } from "../ui/button"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu"
 import { Separator } from "../ui/separator"
+import { MenuItemsInforServer } from "./menu-items-infor-server"
 
 type FunctionsProps = {
   handleEdite: () => void;
@@ -70,9 +70,10 @@ const RenderServerChannels = ({
   userId,
   currentChannelId,
   handleNewsChannel,
-  handleNewsCategory,
   handleDelete,
-  handleEdite
+  handleEdite,
+  handleEditChannel,
+  handleDeleteChannel
 }: InterfacesRender) => {
   if (!server) return null;
 
@@ -136,7 +137,10 @@ const RenderServerChannels = ({
 
   return (
     <>
-      <Separator className="bg-zinc-800" />
+      {/* Header */}
+
+      <Separator className="dark:bg-zinc-800" />
+
       <div className="mt-2 mb-3">
         <Button variant="ghost" className="w-full flex justify-baseline">
           <Calendar size={20} className="mr-1 text-zinc-400" />
@@ -152,7 +156,9 @@ const RenderServerChannels = ({
         </Button>
       </div>
 
-      <Separator className="bg-zinc-800" />
+      <Separator className="dark:bg-zinc-800" />
+
+      {/* Render categories */}
 
       <div className="mt-4">
         <div className="mt-1">
@@ -174,13 +180,13 @@ const RenderServerChannels = ({
                         <ContextMenuTrigger>
                           <div className="flex items-center justify-between w-full">
                             <AccordionTrigger>
-                              <span className="text-xs uppercase font-semibold text-neutral-400 group-hover:text-neutral-200">
+                              <span className="text-xs uppercase font-semibold dark:text-neutral-400 dark:group-hover:text-neutral-200 hover:group-hover:text-zinc-400">
                                 {category.name}
                               </span>
                             </AccordionTrigger>
 
                             {/* criar um canal especifico para category */}
-                            <button className="text-neutral-400 text-xs absolute right-3"
+                            <button className="dark:text-neutral-400 text-xs absolute right-3"
                               onClick={() => handleNewsChannel(category?.id)}>
                               <Plus className="h-3 w-3" />
                             </button>
@@ -205,26 +211,25 @@ const RenderServerChannels = ({
                           ))}
                         </ContextMenuContent>
                       </ContextMenu>
-                      <AccordionContent className="w-full ">
-                        {category.channels.map((chanells) => {
-                          const isActive = chanells.id === currentChannelId;
-                          const unreadCount = unreadCounts[chanells.id] || 0;
+                      <AccordionContent className="w-full flex flex-col gap-2.5">
+                        {category.channels.map((channel) => {
+                          const unreadCount = unreadCounts[channel.id] || 0;
                           const hasUnreadMessages = unreadCount > 0;
-
                           return (
-                            <div className="w-full relative" key={chanells.id}>
-                              {hasUnreadMessages && (
-                                <div className="absolute z-20 w-1 h-2 top-3 bg-white rounded-r-full transition-all" />
-                              )}
-                              <Button
-                                variant={isActive ? "secondary" : "ghost"}
-                                onClick={() => handleChannelClick(chanells.id)}
-                                className="w-full relative justify-start px-3 py-1 text-neutral-400 hover:text-white hover:bg-zinc-700/50 rounded-sm"
-                              >
-                                {channelIcons[chanells.typeChannel]}
-                                <span className="truncate">{chanells.name}</span>
-                              </Button>
-                            </div>
+                            <MenuItemsInforServer
+                              key={channel.id}
+                              userId={userId}
+                              serverId={server.id}
+                              channelId={channel.id}
+                              server={server}
+                              currentChannelId={currentChannelId!}
+                              onEdit={handleEditChannel}
+                              onDelete={handleDeleteChannel}
+                              onServerClick={handleChannelClick}
+                              channelType={channel.typeChannel}
+                              channelName={channel.name}
+                              hasUnreadMessages={hasUnreadMessages}
+                            />
                           );
                         })}
                       </AccordionContent>

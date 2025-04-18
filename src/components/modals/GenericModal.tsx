@@ -58,11 +58,11 @@ export default function GenericModal({
       }
     }}
     >
-      <AlertDialogContent className={cn("bg-[#242429] text-white border-none z-[360]", {
+      <AlertDialogContent className={cn("dark:bg-[#242429] bg-background border-none z-[360]", {
         "overflow-y-scroll h-[90vh]": variant === "createChannel",
       })}>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-white">
+          <AlertDialogTitle className="">
             {title || "Modal"}
           </AlertDialogTitle>
           {description && (

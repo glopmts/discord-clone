@@ -52,7 +52,7 @@ const Header = () => {
   }
 
   return (
-    <header className="w-full p-1 py-2 px-2.5 relative">
+    <header className="w-full p-1 py-2 px-2.5 relative bg-zinc-200/20 dark:bg-background">
       <div className="w-full flex justify-between items-center">
         <div className=""></div>
         {server ? (
@@ -101,7 +101,7 @@ const Header = () => {
               <span className="text-xl font-semibold">Caixa de Entrada</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-12 h-8 cursor-pointer bg-zinc-700 hover:bg-zinc-600/30 flex items-center justify-center gap-2 rounded-md">
+              <div className="w-12 h-8 cursor-pointer bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-600/30 flex items-center justify-center gap-2 rounded-md">
                 <UserPlusIcon size={16} />
                 <span>{pendings?.length || 0}</span>
               </div>
@@ -146,7 +146,7 @@ const FriendRequestItem = ({
   const friend = isRequester ? request.addressee : request.requester;
 
   return (
-    <div className="flex items-center justify-between p-2 hover:bg-zinc-700/30 rounded-md">
+    <div className="flex items-center bg-zinc-400 justify-between p-2 hover:bg-zinc-700/30 rounded-md">
       <div className="flex items-center gap-3">
         <Avatar className="w-10 h-10 border">
           <AvatarImage src={friend.image} alt={friend.username} />
@@ -177,7 +177,7 @@ const ButtonsOptions = ({ onMenuClick, hasPending }: { onMenuClick: () => void, 
   return (
     <div className="flex items-center gap-2.5">
       <button
-        className="cursor-pointer text-neutral-300 hover:text-neutral-100 transition-colors relative"
+        className="cursor-pointer dark:text-neutral-300 hover:opacity-55 dark:hover:text-neutral-100 transition-colors relative"
         onClick={onMenuClick}
         aria-label="Abrir menu"
       >
@@ -189,7 +189,7 @@ const ButtonsOptions = ({ onMenuClick, hasPending }: { onMenuClick: () => void, 
         )}
       </button>
       <button
-        className="cursor-pointer text-neutral-300 hover:text-neutral-100 transition-colors"
+        className="cursor-pointer dark:text-neutral-300 hover:opacity-55 dark:hover:text-neutral-100 transition-colors"
         aria-label="Ajuda"
       >
         <CircleHelp size={18} />

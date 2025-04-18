@@ -82,7 +82,7 @@ const DetailsFriends = ({ userId }: UserIdProps) => {
           </div>
           <div className="flex flex-col gap-1.5">
             <div className="">
-              <span className="text-sm text-zinc-200">Todos os amigos - {friends?.length}</span>
+              <span className="text-sm text-zinc-500 dark:text-zinc-200">Todos os amigos - {friends?.length}</span>
             </div>
           </div>
 
@@ -101,7 +101,7 @@ const DetailsFriends = ({ userId }: UserIdProps) => {
 
                   return (
                     <div className="w-full" key={frind.id}>
-                      <div className="w-full hover:bg-zinc-800/60 rounded-md p-1 flex items-center justify-between" title={friend.username!}
+                      <div className="w-full dark:hover:bg-zinc-800/60 hover:bg-zinc-400/20 rounded-md p-1 flex items-center justify-between" title={friend.username!}
                         onMouseOver={() => setHoverButtons(true)}
                       >
                         <div className="flex items-center gap-2.5 cursor-pointer"
@@ -117,14 +117,14 @@ const DetailsFriends = ({ userId }: UserIdProps) => {
                         </div>
                         <div className="flex z-50 items-center gap-2.5 mr-3 text-zinc-400">
                           <button
-                            className={`rounded-full cursor-pointer p-2 ${hoverButtons ? "bg-zinc-900" : ""}`}
+                            className={`rounded-full cursor-pointer p-2 ${hoverButtons ? "dark:bg-zinc-900 bg-zinc-400/20" : ""}`}
                             onClick={() => handleNavegation(friend.id)}
                           >
                             <MessageCircle size={20} className="hover:text-white" />
                           </button>
                           <div className="">
                             <button
-                              className={`rounded-full cursor-pointer p-2 ${hoverButtons ? "bg-zinc-900" : ""}`}
+                              className={`rounded-full cursor-pointer p-2 ${hoverButtons ? "dark:bg-zinc-900 bg-zinc-400/20" : ""}`}
                               onClick={toggleMenu}>
                               <EllipsisVertical size={20} className="hover:text-white" />
                             </button>
@@ -174,13 +174,13 @@ const MenuOptions = ({ modalRef }: { modalRef: Ref<HTMLDivElement> | undefined }
   ]
 
   return (
-    <div className="w-[210px] h-36 bg-zinc-800 border rounded-md z-50 absolute" ref={modalRef}>
+    <div className="w-[210px] h-36 dark:bg-zinc-800 border bg-background rounded-md z-50 absolute" ref={modalRef}>
       <div className="flex flex-col w-full p-2 gap-2.5">
         {optIonsButtons.map((btn) => (
           <Button
             variant="ghost"
             key={btn.id}
-            className={`w-full flex items-baseline justify-baseline hover:bg-zinc-700 ${btn.type === "delete" ? "text-red-500" : ""}`}>
+            className={`w-full flex items-baseline justify-baseline hover:opacity-75 dark:hover:bg-zinc-700 ${btn.type === "delete" ? "text-red-500" : ""}`}>
             {btn.label}
           </Button>
         ))}

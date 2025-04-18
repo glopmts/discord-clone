@@ -194,7 +194,7 @@ const Channels = () => {
   }, {} as Record<string, typeof allMessages>)
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#1A1A1E]">
+    <div className="w-full h-full flex flex-col bg-background dark:bg-[#1A1A1E]">
       <div className="p-2 w-full h-full flex flex-col">
         {/* header */}
         <HeaderChannels
@@ -212,7 +212,7 @@ const Channels = () => {
               {!isAtBottom && (
                 <button
                   onClick={scrollToBottom}
-                  className="absolute bottom-20 right-6 bg-[#404249] hover:bg-[#4e5058] text-white rounded-full p-2 z-10 shadow-lg transition-all"
+                  className="absolute bottom-20 right-6 dark:bg-[#404249] hover:bg-[#4e5058] rounded-full p-2 z-10 shadow-lg transition-all"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <path d="M16.59 8.59L12 13.17L7.41 8.59L6 10l6 6l6-6l-1.41-1.41z" fill="currentColor" />
@@ -228,17 +228,17 @@ const Channels = () => {
                 <div className="flex flex-col gap-4 pb-4">
                   {/* Conteúdo de boas-vindas */}
                   <div className="flex flex-col gap-4 pt-4">
-                    <div className="rounded-full bg-[#41434a] p-4 w-16 h-16 flex items-center justify-center">
-                      <Hash size={33} className="text-[#949ba4]" />
+                    <div className="rounded-full dark:bg-[#41434a] p-4 w-16 h-16 flex items-center justify-center">
+                      <Hash size={33} className="dark:text-[#949ba4]" />
                     </div>
                     <div className="flex items-center">
-                      <h1 className="font-semibold text-2xl text-white">Bem-vindo(a) a # 💬</h1>
+                      <h1 className="font-semibold text-2xl">Bem-vindo(a) a # 💬</h1>
                       <Dot size={36} />
-                      <span className="font-semibold text-2xl truncate text-white">{channel?.name}</span>
+                      <span className="font-semibold text-2xl truncate">{channel?.name}</span>
                     </div>
                   </div>
 
-                  <div className="text-[#b5bac1] flex items-center text-sm">
+                  <div className="dark:text-[#b5bac1] text-zinc-600 flex items-center text-sm">
                     <p>Este é o começo do canal # 💬 </p>
                     <Dot size={36} />
                     <span>{channel?.name}</span>
@@ -247,7 +247,7 @@ const Channels = () => {
                   {/* render mensagens chat */}
                   <div className="mb-8">
                     {isLoading ? (
-                      <div className="w-full text-zinc-400">
+                      <div className="w-full dark:text-zinc-400">
                         <span className="animate-pulse text-center text-base">Carregando menssagens...</span>
                       </div>
                     ) : (
@@ -255,11 +255,11 @@ const Channels = () => {
                         <div key={date}>
                           <div className="flex w-full relative my-4">
                             <div className="z-[99] flex items-center justify-center w-full">
-                              <div className="w-full h-0.5 bg-[#3f4248]"></div>
-                              <span className="flex w-[250px] items-center justify-center text-xs text-zinc-400 px-2">
+                              <div className="w-full h-0.5 dark:bg-[#3f4248] bg-zinc-500"></div>
+                              <span className="flex w-[250px] items-center justify-center text-xs dark:text-zinc-400 px-2">
                                 {date}
                               </span>
-                              <div className="w-full h-0.5 bg-[#3f4248]"></div>
+                              <div className="w-full h-0.5 dark:bg-[#3f4248] bg-zinc-500"></div>
                             </div>
                           </div>
 
@@ -294,7 +294,7 @@ const Channels = () => {
               <ScrollArea className="flex-1 w-full h-32 mb-15">
                 {loaderServer ? (
                   <div className="w-full h-28 flex items-center justify-center">
-                    <Loader size={28} className="animate-spin text-[#949ba4]" />
+                    <Loader size={28} className="animate-spin dark:dark:text-[#949ba4]" />
                   </div>
                 ) : (
                   <MemberServer
