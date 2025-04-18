@@ -22,7 +22,7 @@ const InfoItem = ({ label, value }: InfoItemProps) => (
       <span className="font-medium">{label}</span>
       <span>{value}</span>
     </div>
-    <button className="px-3 py-1 rounded-md border border-black dark:border-zinc-600 bg-neutral-300 dark:bg-zinc-800 cursor-pointer hover:bg-zinc-600/30 transition-colors">
+    <button className="px-3 py-1 rounded-md border border-black dark:border-zinc-600 bg-neutral-300 dark:bg-zinc-800 cursor-pointer hover:bg-zinc-600/30 dark:hover:bg-zinc-500/40 transition-colors">
       Editar
     </button>
   </div>

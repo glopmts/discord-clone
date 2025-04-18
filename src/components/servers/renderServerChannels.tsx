@@ -7,7 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 import { Button } from "../ui/button"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu"
 import { Separator } from "../ui/separator"
-import { MenuItemsInforServer } from "./menu-items-infor-server"
+import { MenuItemsInforServer } from "./Items-Servers-Channels"
 
 type FunctionsProps = {
   handleEdite: () => void;
@@ -186,7 +186,7 @@ const RenderServerChannels = ({
                             </AccordionTrigger>
 
                             {/* criar um canal especifico para category */}
-                            <button className="dark:text-neutral-400 text-xs absolute right-3"
+                            <button className="dark:text-neutral-400 text-xs absolute cursor-pointer right-3"
                               onClick={() => handleNewsChannel(category?.id)}>
                               <Plus className="h-3 w-3" />
                             </button>

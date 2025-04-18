@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import UserMessageItem from "./userMessageItem";
 
-const links = ({ handlePush }: { handlePush: () => void }) => [
+const links = () => [
   {
     id: 1,
     label: "Amigos",
@@ -45,7 +45,7 @@ const RenderDirectMessages = ({
       </div>
       <Separator className="mt-5" />
       <div className="flex flex-col gap-1 mt-1">
-        {links({ handlePush }).map((c) => {
+        {links().map((c) => {
           return (
             <Button
               key={c.id}

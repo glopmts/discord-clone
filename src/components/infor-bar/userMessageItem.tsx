@@ -28,7 +28,7 @@ const UserMessageItem = ({ user }: { user: UserProps }) => {
           </div>
 
           <div className="flex flex-col items-start overflow-hidden">
-            <span className={`text-sm font-medium  truncate w-full ${mouseHover ? "dark:text-white" : "text-zinc-500"}`}>
+            <span className={`text-sm font-medium  truncate w-full ${mouseHover ? "text-zinc-600 dark:text-white" : "dark:text-white"}`}>
               {user.name}
             </span>
           </div>

@@ -10,15 +10,15 @@ import { useQuery } from "@tanstack/react-query"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
+import { useMenuModalHandler } from "../../hooks/useMenuModalHandler"
 import ContextMenuGlobe from "../ContextMenu"
 import RenderDirectMessages from "../infor-bar/renderDirectMessages"
 import { renderModalContent } from "../infor-bar/renderModalContent"
 import ConviteUserServer from "../modals/convite-users-server"
 import GenericModal from "../modals/GenericModal"
 import { Skeleton } from "../ui/skeleton"
-import { useMenuModalHandler } from "../useMenuModalHandler"
 import MenuOptionsInfor from "./dropdown-menu-options"
-import { MenuItemsInforServer } from "./menu-items-infor-server"
+import { MenuItemsInforServer } from "./Items-Servers-Channels"
 import RenderServerChannels from "./renderServerChannels"
 
 
@@ -46,6 +46,7 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     isOpen: false,
     variant: null,
   });
+
 
   const { setContextMenuOpen, withMenuHandler } = useMenuModalHandler();
 

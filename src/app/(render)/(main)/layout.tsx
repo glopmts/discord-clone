@@ -1,7 +1,7 @@
 "use client"
 
-import Header from "@/components/header"
-import SiderBarInfors from "@/components/servers/sideBar-infors-server"
+import Header from "@/components/Header"
+import SiderBarInfors from "@/components/servers/sideBar-Infor-Servers"
 import SideBarServes from "@/components/servers/sideBar-servers"
 import ProfileHeader from "@/components/user/profile-header"
 import { useAuth } from "@clerk/nextjs"
@@ -13,7 +13,6 @@ export default function DasherboardLayout({
   children: React.ReactNode
 }) {
   const { userId } = useAuth();
-
 
   if (!userId) {
     return null

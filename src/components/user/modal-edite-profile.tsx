@@ -62,7 +62,7 @@ export function AlertEditeProfile({ isOpen, onClose, user, userId, refetch }: Mo
 
   return (
     <AlertDialog open={isOpen}>
-      <AlertDialogContent className="bg-[#1f1f22] text-white border">
+      <AlertDialogContent className="dark:bg-[#1f1f22] bg-background border">
         <AlertDialogHeader>
           <AlertDialogTitle>Editar perfil</AlertDialogTitle>
           <AlertDialogDescription>
@@ -100,7 +100,7 @@ export function AlertEditeProfile({ isOpen, onClose, user, userId, refetch }: Mo
             <textarea
               placeholder="Descrição"
               value={form.description}
-              className="flex min-h-[80px] w-full rounded-md border border-input bg-zinc-800 px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              className="flex min-h-[80px] w-full rounded-md border border-input dark:bg-zinc-800 px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
               maxLength={300}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
             />

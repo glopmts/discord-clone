@@ -22,7 +22,7 @@ const SideBarServers = ({ userId }: UserIdProps) => {
   const searchParams = useSearchParams()
   const currentServerId = searchParams.get('id')
   const pathname = usePathname()
-  const isUserPage = pathname === "/channels/me/";
+  const isUserPage = pathname === "/channels/me";
   const [modalCreate, setModalCreate] = useState(false);
   const [modalConviter, setModalConviter] = useState(false);
   const [selectedServer, setSelectedServer] = useState<{

@@ -74,7 +74,7 @@ export default function MenuOptionsInfor({
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger className="flex items-center justify-between w-full cursor-pointer">
         <span className="font-semibold  truncate">{name}</span>
-        <LucideArrowBigDown size={20} className="text-zinc-500" />
+        <LucideArrowBigDown size={20} className={`text-zinc-500 ${isOpen ? "rotate-180 animate-accordion-up transition-all" : ""}`} />
       </DropdownMenuTrigger>
       <DropdownMenuContent className={cn("w-[14rem]")}>
         <DropdownMenuLabel className="flex items-center justify-between">

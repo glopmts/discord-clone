@@ -2,14 +2,16 @@
 
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@clerk/nextjs"
 import { User } from "@prisma/client"
-import { Search, X } from "lucide-react"
+import { LogOut, Search, X } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { ModeToggle } from "../theme-button"
 import { Separator } from "../ui/separator"
 import { getLinksNavegation } from "./details-props"
 import { InforPerfil } from "./infor-profile-screen"
-import StatusBar from "./status-bar"
+import StatusBar from "./status-bar-user"
 
 type ModalConfig = {
   isOpen?: boolean;
@@ -20,9 +22,11 @@ type ModalConfig = {
 }
 
 const InterfacePageConfigs = ({ onClose, userId, user, isOnline }: ModalConfig) => {
+  const { signOut } = useAuth();
   const [activeItem, setActiveItem] = useState(1);
   const [isPerfil, setPerfil] = useState(true);
   const [activeTab, setActiveTab] = useState("seguranca")
+  const router = useRouter();
 
   const handleTabChange = (tabName: string) => {
     setActiveTab(tabName)
@@ -30,6 +34,11 @@ const InterfacePageConfigs = ({ onClose, userId, user, isOnline }: ModalConfig) 
 
   const handlePerfil = () => {
     setPerfil(!isPerfil);
+  }
+
+  const handleSIgnOut = () => {
+    signOut();
+    router.push("/login")
   }
 
   const linksNavegation = getLinksNavegation({ handlePerfil });
@@ -76,6 +85,14 @@ const InterfacePageConfigs = ({ onClose, userId, user, isOnline }: ModalConfig) 
                 <ModeToggle />
               </div>
             </div>
+            <Separator className="mt-2" />
+            <div className="mt-3">
+              <button className="text-zinc-400 flex items-center justify-between w-full dark:hover:bg-zinc-800 rounded-[8px] p-1 hover:bg-zinc-500/30" onClick={handleSIgnOut}>
+                <span>sair</span>
+                <LogOut size={14} />
+              </button>
+            </div>
+            <Separator className="mt-2" />
           </div>
         </div>
       </div>
