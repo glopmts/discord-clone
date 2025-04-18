@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { assignServerRole } from "@/app/actions/member-servers";
-import { getRoleIcon } from "@/components/IconsCargosMembers";
+import { getRoleIcon } from "@/components/icons/IconsCargosMembers";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/clerk-react";
@@ -131,6 +131,12 @@ const DetailsMembers = ({
             <Check size={16} className="text-white" />
           </Button>
         );
+      case "FRIENDS":
+        return (
+          <Button disabled className="rounded-full w-8 h-8 bg-green-600">
+            <Check size={16} className="text-white" />
+          </Button>
+        );
       case "BLOCKED":
         return (
           <Button disabled className="rounded-full w-8 h-8 bg-red-600/100">
@@ -220,7 +226,7 @@ const DetailsMembers = ({
                     {friendshipStatus && (
                       <span className="text-xs mt-1 text-zinc-400">
                         Status: {friendshipStatus === "PENDING" ? "Pedido pendente" :
-                          friendshipStatus === "ACCEPTED" ? "Amigos" :
+                          friendshipStatus === "FRIENDS" ? "Amigos" :
                             "Bloqueado"}
                       </span>
                     )}

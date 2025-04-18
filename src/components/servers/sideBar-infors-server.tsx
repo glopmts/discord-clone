@@ -1,23 +1,22 @@
 "use client"
 
 import { createNewsCategory, deleteCategoryId } from "@/app/actions/category"
-import { createChannel } from "@/app/actions/channels"
-import { markMessagesChannelRead } from "@/app/actions/menssagens"
+import { createChannel, deleteChannel } from "@/app/actions/channels"
+import { getDirectMessages, markMessagesChannelRead } from "@/app/actions/menssagens"
 import { geServer } from "@/app/actions/servers"
-import { channelIcons } from "@/components/iconsChannels"
 import { UserIdProps } from "@/types/interfaces"
 import { ChannelTypes } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
 import RenderDirectMessages from "../infor-bar/renderDirectMessages"
 import { renderModalContent } from "../infor-bar/renderModalContent"
 import GenericModal from "../modals/GenericModal"
-import { Button } from "../ui/button"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu"
 import { Skeleton } from "../ui/skeleton"
 import MenuOptionsInfor from "./dropdown-menu-options"
+import { MenuItemsInforServer } from "./menu-items-infor-server"
 import RenderServerChannels from "./renderServerChannels"
 
 
@@ -26,11 +25,7 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
   const id = searchParams.get("id");
   const router = useRouter();
   const currentChannelId = searchParams.get("chaId");
-
-  const [selectedCategoryForDelete, setSelectedCategoryForDelete] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
+  const [loader, setLoader] = useState(false);
 
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -41,6 +36,17 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     isOpen: false,
     variant: null,
   });
+
+  const [formData, setFormData] = useState<{
+    name: string;
+    typeChannel?: ChannelTypes;
+    isPrivate?: boolean;
+  }>({
+    name: "",
+    typeChannel: "TEXT",
+    isPrivate: false,
+  });
+
 
   //Query get server
   const {
@@ -53,6 +59,16 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     queryFn: () => (id ? geServer(id) : null),
     enabled: !!id,
   });
+
+  const {
+    data: messages,
+    isLoading: loaderMessages,
+  } = useQuery({
+    queryKey: ["direct_messages", userId],
+    queryFn: () => (userId ? getDirectMessages(userId) : null),
+    enabled: !!userId,
+  });
+
 
   useEffect(() => {
     if (id) {
@@ -75,15 +91,6 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     router.push(`/channels/?id=${id}&chaId=${channelId}`)
   };
 
-  const [formData, setFormData] = useState<{
-    name: string;
-    typeChannel?: ChannelTypes;
-    isPrivate?: boolean;
-  }>({
-    name: "",
-    typeChannel: "TEXT",
-    isPrivate: false,
-  });
 
   const handleNewsChannel = (categoryId?: string) => {
     setModalState({
@@ -110,26 +117,30 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     });
   };
 
-  const handleDeleteCategory = (categoryId?: string,) => {
+  const handleDeleteCategory = (categoryId: string, categoryName: string) => {
     setModalState({
       isOpen: true,
       variant: "delete",
-      categoryId: categoryId || undefined,
+      categoryId,
+      deleteData: { id: categoryId, name: categoryName }
     });
-
   };
 
   const handleConfirmDelete = async () => {
-    if (selectedCategoryForDelete) {
-      try {
-        await deleteCategoryId(selectedCategoryForDelete.id, userId)
-        await refetch();
-        toast.success("Categoria deletada com sucesso!")
-        setSelectedCategoryForDelete(null);
-      } catch (error) {
-        console.error("Erro ao deletar categoria:", error);
-        toast.error("Erro ao deletar categoria:")
-      }
+    if (!modalState.categoryId) return;
+    setLoader(true);
+
+    try {
+      await deleteCategoryId(modalState.categoryId, userId);
+      await refetch();
+      toast.success("Categoria deletada com sucesso!");
+      setModalState({ isOpen: false, variant: null });
+    } catch (error: any) {
+      console.error("Erro ao deletar categoria:", error);
+      toast.error(error.message || "Erro ao deletar categoria");
+      setLoader(false)
+    } finally {
+      setLoader(false)
     }
   };
 
@@ -161,11 +172,29 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
       refetch?.();
       setModalState({ isOpen: false, variant: null });
     } catch (error) {
-      console.error("Error creating channel:", error);
+      console.error("Error creating category:", error);
       toast.error("Erro ao criar categoia!");
     }
   };
 
+
+  const handleDeleteChannel = useCallback(async (channelId: string) => {
+    if (!channelId) return;
+
+    try {
+      await deleteChannel(channelId, userId);
+      toast.success("Canal deletado com sucesso!");
+      refetch?.();
+      setModalState({ isOpen: false, variant: null });
+    } catch (error) {
+      console.error("Error delete channel:", error);
+      toast.error("Erro ao deletar canal!");
+    }
+  }, []);
+
+  const handleEditChannel = () => {
+
+  }
 
   const getModalTitle = () => {
     switch (modalState.variant) {
@@ -223,48 +252,62 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
                       handleDelete={handleDeleteCategory}
                       handleEdite={() => { }}
                     />
-                    <div>
-                      {server.channels
-                        .filter(channel => !channel.categoryId)
-                        .map((channel) => {
-                          const channelId = channel.id;
-                          const isActive = currentChannelId === channelId;
 
-                          return (
-                            <div className="w-full" key={channel.id}>
-                              <Button
-                                variant={isActive ? "secondary" : "ghost"}
-                                onClick={() => handleServerClick(channel.id)}
-                                className="w-full justify-start px-3 py-1 text-neutral-400 hover:text-white hover:bg-zinc-700/50 rounded-sm"
-                              >
-                                {channelIcons[channel.typeChannel]}
-                                <span className="truncate">{channel.name}</span>
-                              </Button>
-                            </div>
-                          );
-                        })}
-                    </div>
+                    {server.channels
+                      .filter(channel => !channel.categoryId)
+                      .map((channel) => (
+                        <MenuItemsInforServer
+                          key={channel.id}
+                          userId={userId}
+                          serverId={server.id}
+                          channelId={channel.id}
+                          server={server}
+                          currentChannelId={currentChannelId!}
+                          onEdit={handleEditChannel}
+                          onDelete={handleDeleteChannel}
+                          onServerClick={handleServerClick}
+                          channelType={channel.typeChannel}
+                          channelName={channel.name}
+                        />
+                      ))}
                   </div>
                 </>
               ) : (
-                <RenderDirectMessages userId={userId} />
+                loaderMessages ? (
+                  <div className="w-full flex items-center gap-1.5">
+                    <div className="">
+                      <Skeleton className="w-9 h-9 rounded-full" />
+                    </div>
+                    <Skeleton className="w-full h-4 rounded-md" />
+                  </div>
+                ) : (
+                  <RenderDirectMessages messages={messages as any} />
+                )
               )}
             </div>
           </div>
         </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem>Criar um canal</ContextMenuItem>
-          <ContextMenuItem>Criar categoria</ContextMenuItem>
-          <ContextMenuItem>Convidar pessoas</ContextMenuItem>
-        </ContextMenuContent>
+        {server && (
+          <ContextMenuContent>
+            <>
+              <ContextMenuItem>Criar um canal</ContextMenuItem>
+              <ContextMenuItem>Criar categoria</ContextMenuItem>
+              <ContextMenuItem>Convidar pessoas</ContextMenuItem>
+            </>
+          </ContextMenuContent>
+        )}
       </ContextMenu>
 
 
-      {/* modal */}
+      {/* modal functions options server */}
 
       <GenericModal
         isOpen={modalState.isOpen}
-        onClose={() => setModalState({ isOpen: false, variant: null })}
+        onClose={() => {
+          if (!loader) {
+            setModalState({ isOpen: false, variant: null });
+          }
+        }}
         variant={modalState.variant || "createChannel" || "createCategory" || "delete"}
         title={getModalTitle()}
         description={

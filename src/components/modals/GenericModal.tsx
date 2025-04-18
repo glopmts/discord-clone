@@ -1,5 +1,3 @@
-"use client"
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,7 +39,7 @@ export default function GenericModal({
   const handleConfirm = async () => {
     try {
       setLoader(true);
-      onConfirm?.();
+      await onConfirm?.();
     } finally {
       setLoader(false);
     }
@@ -54,8 +52,13 @@ export default function GenericModal({
   };
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent className={cn("bg-[#242429] text-white border-none", {
+    <AlertDialog open={isOpen} onOpenChange={(open) => {
+      if (!open && !loader) {
+        onClose();
+      }
+    }}
+    >
+      <AlertDialogContent className={cn("bg-[#242429] text-white border-none z-[360]", {
         "overflow-y-scroll h-[90vh]": variant === "createChannel",
       })}>
         <AlertDialogHeader>

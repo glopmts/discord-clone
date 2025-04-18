@@ -1,16 +1,12 @@
 "use client";
 
-import { getDirectMessages } from "@/app/actions/menssagens";
 import { cn } from "@/lib/utils";
-import { UserIdProps } from "@/types/interfaces";
-import { useQuery } from "@tanstack/react-query";
+import { UserProps } from "@/types/interfaces";
 import { Store, Users } from "lucide-react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
+import UserMessageItem from "./userMessageItem";
 
 const links = ({ handlePush }: { handlePush: () => void }) => [
   {
@@ -18,30 +14,21 @@ const links = ({ handlePush }: { handlePush: () => void }) => [
     label: "Amigos",
     icon: <Users className="h-5 w-5 text-neutral-400" />,
     active: "/channels/me",
-    onclick: () => handlePush(),
   },
   {
     id: 3,
     label: "Loja",
     icon: <Store className="h-5 w-5 text-neutral-400" />,
     active: "/channels/store",
-    onclick: () => handlePush(),
   },
 ]
 
 
-const RenderDirectMessages = ({ userId }: UserIdProps) => {
-  const {
-    data: messages,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ["direct_messages", userId],
-    queryFn: () => (userId ? getDirectMessages(userId) : null),
-    enabled: !!userId,
-  });
-
+const RenderDirectMessages = ({
+  messages
+}: {
+  messages: UserProps[];
+}) => {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -62,7 +49,7 @@ const RenderDirectMessages = ({ userId }: UserIdProps) => {
           return (
             <Button
               key={c.id}
-              onClick={() => handlePush()}
+              onClick={handlePush}
               variant={pathname === c.active ? "secondary" : "ghost"}
               className={cn(`w-full justify-start rounded-md cursor-pointer flex items-center gap-1.5`)}
             >
@@ -84,43 +71,9 @@ const RenderDirectMessages = ({ userId }: UserIdProps) => {
         </div>
         <div className="w-full">
           <div className="w-full flex flex-col gap-2.5">
-            {messages?.map((user) => {
-              const [mouseHover, setHover] = useState(false);
-
-              return (
-                <div
-                  onMouseEnter={() => setHover(true)}
-                  onMouseLeave={() => setHover(false)}
-                  className="w-full flex justify-between items-center gap-2 h-10 hover:bg-zinc-900 rounded-md transition-all p-1"
-                  key={user.clerk_id}
-                >
-                  <Link href={`/channels/me/${user.id}`} className="w-full"
-                  >
-                    <div className="flex items-center gap-2 w-full">
-                      <div className="relative">
-                        <Avatar className="w-8 h-8">
-                          <AvatarImage src={user.image!!} />
-                          <AvatarFallback>
-                            {user.username?.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                      </div>
-
-                      <div className="flex flex-col items-start overflow-hidden">
-                        <span className={`text-sm font-medium  truncate w-full ${mouseHover ? "text-white" : "text-zinc-400"}`}>
-                          {user.name}
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                  <div className="">
-                    <button className={`text-zinc-400 z-30 mr-0.5 cursor-pointer hover:text-white ${mouseHover ? "block" : "hidden"}`}>
-                      <span className="text-[18px]">+</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+            {messages?.map((user: UserProps) => (
+              <UserMessageItem key={user.clerk_id} user={user} />
+            ))}
           </div>
         </div>
       </div>

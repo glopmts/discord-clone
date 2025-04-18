@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { hasPermission } from "@/lib/permissions";
 
 export async function createNewsCategory(data: {
   serverId: string;
@@ -45,6 +46,13 @@ export async function deleteCategoryId(categoryId: string, userId: string) {
 
     if (category.server.ownerId !== userId) {
       throw new Error("Unauthorized - You don't own this category");
+    }
+
+    const isOwner = category.server.ownerId === userId;
+    const hasAdminPermission = await hasPermission(userId, category.server.id, 'admin');
+
+    if (!isOwner && !hasAdminPermission) {
+      throw new Error("Você precisa ser administrador ou dono do servidor para deletar categorias");
     }
 
     return await db.$transaction(async (prisma) => {

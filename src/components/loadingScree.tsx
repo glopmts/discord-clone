@@ -1,7 +1,15 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 
-const LoadingScreen = () => {
+type LoadingProps = {
+  width?: number;
+  height?: number;
+}
+
+const LoadingScreen = ({
+  height,
+  width
+}: LoadingProps) => {
   return (
     <motion.div
       className="w-full h-screen z-[999]"
@@ -16,8 +24,8 @@ const LoadingScreen = () => {
           <Image
             src="/icons/animete-discord.gif"
             alt="animete logo"
-            width={150}
-            height={150}
+            width={width || 150}
+            height={height || 150}
             sizes="100vw"
             unoptimized
           />

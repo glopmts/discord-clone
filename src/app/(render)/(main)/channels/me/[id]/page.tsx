@@ -3,6 +3,7 @@
 import { getMessagesFriends } from "@/app/actions/menssagens";
 import { getServersByUserId } from "@/app/actions/servers";
 import { deleteMessageFriends, getUserById } from "@/app/actions/user";
+import { IconBar } from "@/components/icons/IcnonsListFriends";
 import LoadingScreen from "@/components/loadingScree";
 import InputMenssagens from "@/components/servers/messages/input-menssagens";
 import RenderMessagens from "@/components/servers/messages/message-content-render";
@@ -11,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { socket } from "@/services/socket-io";
-import { IconBar } from "@/types/icnonsListFriends";
 import { formatDateComplete, formatMessageDate } from "@/utils/formatDate";
 import { useAuth } from "@clerk/nextjs";
 import { MessageFriends } from "@prisma/client";

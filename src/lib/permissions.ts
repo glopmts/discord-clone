@@ -33,6 +33,26 @@ export const hasServerRole = (
   );
 };
 
+export const hasAnyPermission = async (
+  userId: string,
+  serverId: string,
+  requiredRoles: Roles[]
+): Promise<boolean> => {
+
+  const userRole = await getServerRole(userId, serverId);
+  const roleHierarchy: Record<Roles, number> = {
+    owner: 4,
+    admin: 3,
+    moderator: 2,
+    vip: 1,
+    user: 0
+  };
+
+  return requiredRoles.some(role =>
+    roleHierarchy[userRole] >= roleHierarchy[role]
+  );
+};
+
 export const canDeletePermission = (
   currentUserId: string,
   message: UnifiedMessage,

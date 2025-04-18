@@ -64,8 +64,9 @@ export type MessagePropsRender = {
 
 export interface InterfacesRender {
   server: {
-    name: string;
     id: string;
+    name: string;
+    ownerId: string;
     createdAt: Date;
     Category: {
       id: string;
@@ -82,6 +83,10 @@ export interface InterfacesRender {
       }[];
     }[];
     members?: any[];
+    MemberCargo: {
+      role: Roles,
+      userId: string;
+    }[]
   };
   userId: string;
 

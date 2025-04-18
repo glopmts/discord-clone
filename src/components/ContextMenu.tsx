@@ -11,30 +11,31 @@ type ContextMenuGlobeProps = {
   children: ReactNode;
   menuItems: MenuItem[];
   onOpenChange?: (open: boolean) => void;
+  className?: string;
 };
 
 const ContextMenuGlobe = ({
   children,
   menuItems,
+  className,
   onOpenChange,
 }: ContextMenuGlobeProps) => {
 
-  const handleAction = (action: () => void) => {
-    return (e: React.MouseEvent) => {
-      e.preventDefault();
-      if (onOpenChange) onOpenChange(false);
-      action();
-    };
+  const handleItemClick = (itemAction: () => void) => {
+    if (onOpenChange) onOpenChange(false);
+    itemAction();
   };
 
   return (
     <ContextMenu onOpenChange={onOpenChange}>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-      <ContextMenuContent className="w-64 z-[200]" onInteractOutside={() => onOpenChange?.(false)}>
+      <ContextMenuContent className={`w-64 z-[200] ${className}`}
+        onInteractOutside={() => onOpenChange?.(false)}
+      >
         {menuItems.map((item, index) => (
           <ContextMenuItem
             key={index}
-            onClick={handleAction(item.action)}
+            onClick={() => handleItemClick(item.action)}
             disabled={item.disabled}
             className={
               item.destructive

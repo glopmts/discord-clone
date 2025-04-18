@@ -55,7 +55,6 @@ const RenderSideBarServer = ({
       <div className="flex flex-col items-center space-y-2 w-full mt-2">
         {servers?.map((server) => {
           const isActive = currentServerId === server.id
-
           return (
             <ContextMenu
               key={contextMenuOpen}
@@ -122,7 +121,6 @@ const RenderSideBarServer = ({
                     {nv.label}
                   </ContextMenuItem>
                 ))}
-
               </ContextMenuContent>
             </ContextMenu>
           )

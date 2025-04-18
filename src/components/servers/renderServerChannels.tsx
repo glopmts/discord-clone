@@ -1,5 +1,5 @@
 import { getUnreadMessagesCount, markMessagesChannelRead } from "@/app/actions/menssagens"
-import { channelIcons } from "@/components/iconsChannels"
+import { channelIcons } from "@/components/icons/IconsChannels"
 import { InterfacesRender } from "@/types/interfaces"
 import { Calendar, LucideListMinus, Plus, Users } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -9,35 +9,61 @@ import { Button } from "../ui/button"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu"
 import { Separator } from "../ui/separator"
 
-
 type FunctionsProps = {
   handleEdite: () => void;
   handleDelete: (categoryId: string, categoryName: string) => void;
   category?: {
     id: string;
     name: string;
-  }
-}
+  };
+  userId: string;
+  server: InterfacesRender['server'];
+};
 
-const optionsContextMenu = ({ handleEdite, handleDelete, category }: FunctionsProps) => [
-  {
-    id: 1,
-    label: "Editar categoria",
-    onClick: (handleCloseMenu: () => void) => {
-      handleEdite();
-      handleCloseMenu();
+const optionsContextMenu = ({ handleEdite, handleDelete, category, userId, server }: FunctionsProps) => {
+  const isOwner = server?.ownerId === userId;
+  const isAdmin = server?.MemberCargo?.some(
+    member => member.userId === userId && (member.role === 'admin' || member.role === 'owner' || member.role === "moderator")
+  );
+
+  const adminOptions = [
+    {
+      id: 1,
+      label: "Editar categoria",
+      onClick: (handleCloseMenu: () => void) => {
+        handleEdite();
+        handleCloseMenu();
+      }
+    },
+    {
+      id: 2,
+      label: "Excluir categoria",
+      type: "delete",
+      onClick: (handleCloseMenu: () => void) => {
+        handleDelete(category?.id!, category?.name!);
+        handleCloseMenu();
+      }
     }
-  },
-  {
-    id: 2,
-    label: "Excluir categoria",
-    type: "delete",
-    onClick: (handleCloseMenu: () => void) => {
-      handleDelete(category?.id!, category?.name!);
-      handleCloseMenu();
+  ];
+
+  const regularUserOptions = [
+    {
+      id: 3,
+      label: "Denunciar categoria",
+      type: "alert",
+      onClick: (handleCloseMenu: () => void) => {
+        handleCloseMenu();
+      }
     }
-  },
-]
+  ];
+
+  if (isOwner || isAdmin) {
+    return adminOptions;
+  } else {
+    return regularUserOptions;
+  }
+};
+
 
 const RenderServerChannels = ({
   server,
@@ -166,6 +192,8 @@ const RenderServerChannels = ({
                           {optionsContextMenu({
                             handleDelete: () => handleDelete(category.id, category.name),
                             handleEdite: () => handleEdite(),
+                            userId: userId,
+                            server: server
                           }).map((fc) => (
                             <ContextMenuItem
                               key={fc.id}

@@ -55,7 +55,7 @@ export default function ModalCreateServer({
 
   return (
     <AlertDialog open={isOpen}>
-      <AlertDialogContent className={cn("bg-[#242429]")}>
+      <AlertDialogContent className={cn("bg-[#242429] z-[360]")}>
         <AlertDialogHeader>
           <AlertDialogTitle>Personalizer seu servidor</AlertDialogTitle>
           <AlertDialogDescription>

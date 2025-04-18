@@ -1,4 +1,4 @@
-import { getRoleIcon } from "@/components/IconsCargosMembers";
+import { getRoleIcon } from "@/components/icons/IconsCargosMembers";
 import { canDeletePermission } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { MenuItem, ServerPropsMember } from "@/types/interfaces";
