@@ -2,29 +2,42 @@
 
 import { db } from "@/lib/db";
 import { hasPermission } from "@/lib/permissions";
+import { Category } from "@prisma/client";
 
-export async function createNewsCategory(data: {
+export async function createOrUpdateCategory(data: {
   serverId: string;
   name: string;
+  categoryId?: string;
 }) {
   try {
     if (!data.serverId || !data.name) {
-      throw new Error("Server ID and name are required!")
+      throw new Error("Server ID and name are required!");
     }
 
-    const category = await db.category.create({
-      data: {
-        ...data
-      }
-    })
+    if (data.categoryId) {
+      const updatedCategory = await db.category.update({
+        where: { id: data.categoryId },
+        data: {
+          name: data.name,
+        },
+      });
 
-    return { category }
+      return { category: updatedCategory };
+    } else {
+      const newCategory = await db.category.create({
+        data: {
+          serverId: data.serverId,
+          name: data.name,
+        },
+      });
 
+      return { category: newCategory };
+    }
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Failed to create category: ${error.message}`)
+      throw new Error(`Failed to create or update category: ${error.message}`);
     }
-    throw new Error("Failed to create category")
+    throw new Error("Failed to create or update category");
   }
 }
 
@@ -81,5 +94,31 @@ export async function deleteCategoryId(categoryId: string, userId: string) {
       throw error;
     }
     throw new Error("Failed to delete category");
+  }
+}
+
+export async function updateActiveCategory(categoryId: string): Promise<{ category: Category }> {
+  if (!categoryId) {
+    throw new Error("Category ID is required");
+  }
+
+  const category = await db.category.findUnique({
+    where: { id: categoryId },
+  });
+
+  if (!category) {
+    throw new Error("Category not found");
+  }
+
+  try {
+    const updatedCategory = await db.category.update({
+      where: { id: categoryId },
+      data: { isActive: !category.isActive },
+    });
+
+    return { category: updatedCategory };
+  } catch (error) {
+    console.error("Error updating active category:", error);
+    throw error instanceof Error ? error : new Error("Failed to update active category");
   }
 }

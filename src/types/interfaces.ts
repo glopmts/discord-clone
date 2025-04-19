@@ -69,6 +69,7 @@ export interface InterfacesRender {
     ownerId: string;
     createdAt: Date;
     Category: {
+      isActive: boolean;
       id: string;
       name: string;
       channels: {
@@ -92,12 +93,12 @@ export interface InterfacesRender {
 
   handleNewsChannel: (categoryId?: string) => void;
   handleDeleteChannel: (channelId: string) => Promise<void>;
-  handleEditChannel: (channelId?: string) => void;
+  handleEditChannel: (channelId: string) => void;
   handleNewsCategory: () => void;
   handleServerClick: (id: string) => void;
-  handleEdite: () => void;
   currentChannelId?: string;
   handleDelete: (categoryId: string, categoryName: string) => void;
+  handleEditeCategory: (categoryId: string, categoryName: string) => void;
 }
 
 export type MenuItem = {
@@ -145,3 +146,6 @@ export type UnifiedMessage = {
   sendUser?: any;
   receivesFriends?: any;
 };
+
+
+export type ModalVariant = "createChannel" | "createCategory" | "delete" | "editCategory" | "editChannel";

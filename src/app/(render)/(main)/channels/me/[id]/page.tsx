@@ -342,7 +342,7 @@ const ChatFriends = () => {
           </div>
 
           {/* Message Input */}
-          <div className="sticky bottom-3 dark:bg-[#1A1A1E] bg-background p-4 pt-0">
+          <div className="sticky -bottom-1 dark:bg-[#1A1A1E] bg-background p-4 pt-0">
             <InputMenssagens
               name={friends?.name || "user"}
               messageInput={messageInput}
@@ -362,14 +362,14 @@ const ChatFriends = () => {
               </Button>
             </div>
             <div className="relative px-4 pb-4">
-              <div className="flex flex-col items-center -mt-16">
+              <div className="flex flex-col -mt-14">
                 <Avatar className="w-20 h-20 border-4 border-[#2b2d31] rounded-full">
                   <AvatarImage className="rounded-full object-cover" src={friends?.image!} alt={friends?.username!} />
                   <AvatarFallback className="bg-[#313133] text-white">
                     {friends?.username?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col items-center mt-3">
+                <div className="flex flex-col mt-3">
                   <span className="text-lg font-semibold text-black dark:text-white">{friends?.name}</span>
                   <span className="text-sm dark:text-gray-400 text-zinc-500">@{friends?.username}</span>
                 </div>

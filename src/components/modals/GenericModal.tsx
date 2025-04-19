@@ -8,9 +8,9 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import { ModalVariant } from "@/types/interfaces";
 import { ReactNode, useState } from "react";
 
-type ModalVariant = "createChannel" | "createCategory" | "delete" | "convite";
 
 interface GenericModalProps {
   isOpen: boolean;

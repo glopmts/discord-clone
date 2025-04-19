@@ -22,7 +22,7 @@ const SideBarServers = ({ userId }: UserIdProps) => {
   const searchParams = useSearchParams()
   const currentServerId = searchParams.get('id')
   const pathname = usePathname()
-  const isUserPage = pathname === "/channels/me";
+  const isUserPage = pathname.startsWith("/channels/me");
   const [modalCreate, setModalCreate] = useState(false);
   const [modalConviter, setModalConviter] = useState(false);
   const [selectedServer, setSelectedServer] = useState<{
@@ -56,15 +56,12 @@ const SideBarServers = ({ userId }: UserIdProps) => {
     if (firstChannelId) {
       queryParams.set('chaId', firstChannelId);
     }
-
-
     router.push(`/channels/?${queryParams.toString()}`);
   };
 
   const handleUserClick = () => {
     router.push(`/channels/me`)
   }
-
 
   const handleExitSever = async (serverId: string) => {
     const confirmExit = window.confirm("Tem certeza que deseja sair deste servidor?");
@@ -177,8 +174,6 @@ const SideBarServers = ({ userId }: UserIdProps) => {
           </div>
         </ScrollArea>
       </div>
-
-      {/* modal create server */}
 
       {modalCreate && (
         <ModalCreateServer

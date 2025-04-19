@@ -1,10 +1,10 @@
 "use client"
 
-import { createNewsCategory, deleteCategoryId } from "@/app/actions/category"
+import { createOrUpdateCategory, deleteCategoryId } from "@/app/actions/category"
 import { createChannel, deleteChannel } from "@/app/actions/channels"
 import { getDirectMessages, markMessagesChannelRead } from "@/app/actions/menssagens"
 import { geServer } from "@/app/actions/servers"
-import { UserIdProps } from "@/types/interfaces"
+import { ModalVariant, UserIdProps } from "@/types/interfaces"
 import { ChannelTypes } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -39,7 +39,7 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
 
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
-    variant: "createChannel" | "createCategory" | "delete" | null;
+    variant: ModalVariant | null;
     categoryId?: string;
     deleteData?: { id: string; name: string };
   }>({
@@ -54,6 +54,8 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     name: string;
     typeChannel?: ChannelTypes;
     isPrivate?: boolean;
+    channelId?: string;
+    categoryId?: string;
   }>({
     name: "",
     typeChannel: "TEXT",
@@ -62,24 +64,18 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
 
 
   //Query get server
-  const {
-    data: server,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
+  const { data: server, isLoading, error, refetch } = useQuery({
     queryKey: ["server", id],
     queryFn: () => (id ? geServer(id) : null),
     enabled: !!id,
+    staleTime: 1000 * 60 * 5,
   });
 
-  const {
-    data: messages,
-    isLoading: loaderMessages,
-  } = useQuery({
+  const { data: messages, isLoading: loaderMessages } = useQuery({
     queryKey: ["direct_messages", userId],
     queryFn: () => (userId ? getDirectMessages(userId) : null),
     enabled: !!userId,
+    staleTime: 1000 * 60 * 2,
   });
 
 
@@ -158,6 +154,7 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
   const handleCreateChannel = async () => {
     try {
       await createChannel({
+        userId,
         serverId: id as string,
         name: formData.name,
         typeChannel: formData.typeChannel!,
@@ -175,7 +172,7 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
 
   const handleCreateCategory = async () => {
     try {
-      await createNewsCategory({
+      await createOrUpdateCategory({
         serverId: id as string,
         name: formData.name,
       });
@@ -187,7 +184,6 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
       toast.error("Erro ao criar categoia!");
     }
   };
-
 
   const handleDeleteChannel = useCallback(async (channelId: string) => {
     if (!channelId) return;
@@ -203,14 +199,83 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     }
   }, []);
 
-  const handleEditChannel = () => {
+  const handleEditChannel = (channelId: string) => {
+    const channelToEdit = server?.channels.find((channel) => channel.id === channelId);
 
-  }
+    if (!channelToEdit) return;
+
+    setModalState({
+      isOpen: true,
+      variant: "editChannel",
+    });
+
+    setFormData({
+      name: channelToEdit.name,
+      typeChannel: channelToEdit.typeChannel,
+      isPrivate: channelToEdit.isPrivate || false,
+      channelId: channelId,
+    });
+  };
+
+  const handleEditeChannel = async () => {
+    try {
+      await createChannel({
+        userId,
+        name: formData.name,
+        serverId: id as string,
+        typeChannel: formData.typeChannel!,
+        isPrivate: formData.isPrivate!,
+        categoryId: modalState.categoryId,
+        channelId: formData.channelId,
+      });
+      toast.success("Canal editado com sucesso!");
+      refetch?.();
+      setModalState({ isOpen: false, variant: null });
+    } catch (error) {
+      console.error("Error creating channel:", error);
+      toast.error("Erro ao editar canal!");
+    }
+  };
+
+  const handleEditeCategory = (categoryId: string) => {
+    setModalState({
+      isOpen: true,
+      variant: "editCategory",
+      categoryId: categoryId || undefined,
+    });
+    setFormData({
+      name: server?.Category.find((category) => category.id === categoryId)?.name || "",
+    });
+  };
+
+  const handleEditCategory = async () => {
+    if (!modalState.categoryId) return;
+    setLoader(true);
+
+    try {
+      await createOrUpdateCategory({
+        serverId: id as string,
+        name: formData.name,
+        categoryId: modalState.categoryId,
+      });
+      await refetch();
+      toast.success("Categoria editada com sucesso!");
+      setModalState({ isOpen: false, variant: null });
+    } catch (error: any) {
+      console.error("Erro ao editar categoria:", error);
+      toast.error(error.message || "Erro ao editar categoria");
+      setLoader(false)
+    } finally {
+      setLoader(false)
+    }
+  };
 
   const getModalTitle = () => {
     switch (modalState.variant) {
       case "createChannel": return "Criar canal";
       case "createCategory": return "Criar categoria";
+      case "editCategory": return "Editando categoria";
+      case "editChannel": return "Editando canal";
       case "delete": return "Excluir categoria";
       default: return "";
     }
@@ -221,6 +286,8 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
       case "createChannel": return handleCreateChannel;
       case "createCategory": return handleCreateCategory;
       case "delete": return handleConfirmDelete;
+      case "editCategory": return handleEditCategory;
+      case "editChannel": return handleEditeChannel;
       default: return () => { };
     }
   };
@@ -233,6 +300,7 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     setSelectedServer(server);
     setModalConviter(true);
   };
+
 
 
   return (
@@ -294,12 +362,12 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
                     handleNewsCategory={handleNewsCategory}
                     handleServerClick={handleChannelClick}
                     handleDelete={handleDeleteCategory}
-                    handleEdite={() => { }}
+                    handleEditeCategory={handleEditeCategory}
                     handleDeleteChannel={handleDeleteChannel}
                     handleEditChannel={handleEditChannel}
                   />
 
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1.5 p-1.5">
                     {/* Render channels that do not belong to any category */}
                     {server.channels
                       .filter(channel => !channel.categoryId)
@@ -308,14 +376,12 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
                           key={channel.id}
                           userId={userId}
                           serverId={server.id}
-                          channelId={channel.id}
                           server={server}
                           currentChannelId={currentChannelId!}
                           onEdit={handleEditChannel}
                           onDelete={handleDeleteChannel}
                           onServerClick={handleServerClick}
-                          channelType={channel.typeChannel}
-                          channelName={channel.name}
+                          channel={channel}
                         />
                       ))}
                   </div>
@@ -344,7 +410,7 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
             setModalState({ isOpen: false, variant: null });
           }
         }}
-        variant={modalState.variant || "createChannel" || "createCategory" || "delete"}
+        variant={modalState.variant || "createChannel" || "createCategory" || "delete" || "editCategory" || "editChannel"}
         title={getModalTitle()}
         description={
           modalState.variant === "createChannel"
