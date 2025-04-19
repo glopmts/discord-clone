@@ -63,6 +63,30 @@ export async function getUserByClerkId(clerkId: string) {
   }
 }
 
+export async function updateOnlineStatus(userId: string, status: boolean) {
+  try {
+    if (!userId) {
+      throw new Error("User ID is required!")
+    }
+
+    const user = await db.user.update({
+      where: {
+        clerk_id: userId,
+      },
+      data: {
+        isOnline: status,
+      },
+    })
+
+    return user
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to update online status: ${error.message}`)
+    }
+    throw new Error("Failed to update online status")
+  }
+}
+
 export async function getUserDetails(userId: string) {
   try {
     if (!userId) {

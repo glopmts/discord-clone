@@ -19,7 +19,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
 type MenuDetailsProps = {
   memberId: string;
   serverId: string;
@@ -162,7 +161,7 @@ const DetailsMembers = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={cn("p-0 overflow-hidden z-[200] bg-background dark:bg-zinc-800 w-[400px]")}>
+      <DialogContent className={cn("p-0 overflow-hidden z-[200] bg-background dark:bg-zinc-800 w-[500px] h-[480px]")}>
         <DialogTitle className="hidden"></DialogTitle>
         <div className="w-full">
           {error && (
@@ -177,16 +176,16 @@ const DetailsMembers = ({
           ) : (
             <div className="w-full h-full">
               <div className="w-full relative">
-                <div className="w-full h-18 bg-blue-600 relative"></div>
+                <div className="w-full h-32 bg-blue-600 relative"></div>
                 <div className="p-2 flex flex-col gap-2.5 relative -top-8 z-40">
                   <div className="h-18 w-18 rounded-full flex items-center justify-between">
-                    <Avatar className="h-18 w-18 p-1 rounded-full relative bg-zinc-700">
+                    <Avatar className="h-21 w-21 p-1 rounded-full relative bg-zinc-700">
                       <AvatarImage src={member?.image ?? "No image user"} className="object-cover rounded-full" alt="User avatar" />
                       <AvatarFallback>
                         {member?.username?.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="z-50 absolute top-0 left-19">
+                    <div className="z-50 absolute top-0 left-23">
                       {getStatusButton()}
                     </div>
                   </div>
@@ -231,9 +230,6 @@ const DetailsMembers = ({
                       </span>
                     )}
                   </div>
-                </div>
-                <div className="mt-4 p-2">
-                  <Input placeholder="conversar" className={cn("w-full")} />
                 </div>
               </div>
             </div>

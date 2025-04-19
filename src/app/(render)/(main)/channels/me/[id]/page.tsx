@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import InforUserImage from "@/components/user/infor-user-image";
 import { socket } from "@/services/socket-io";
 import { formatDateComplete, formatMessageDate } from "@/utils/formatDate";
 import { useAuth } from "@clerk/nextjs";
@@ -354,57 +355,51 @@ const ChatFriends = () => {
 
         {/* User Info Panel */}
         {isOpen && (
-          <div className="w-[350px] h-full bg-zinc-400/20 dark:bg-[#2b2d31] border-l border-zinc-400 dark:border-[#1e1f22] flex-shrink-0 overflow-y-auto">
-            <div className="w-full h-32 bg-[#5865f2] relative"></div>
-            <div className="absolute top-2 right-2">
-              <Button className="dark:bg-[#1e1f22] bg-zinc-400/30/80 w-8 h-8 rounded-full hover:dark:bg-[#1e1f22] bg-zinc-400/30 cursor-pointer">
-                <UserCheck size={18} />
-              </Button>
-            </div>
-            <div className="relative px-4 pb-4">
-              <div className="flex flex-col -mt-14">
-                <Avatar className="w-20 h-20 border-4 border-[#2b2d31] rounded-full">
-                  <AvatarImage className="rounded-full object-cover" src={friends?.image!} alt={friends?.username!} />
-                  <AvatarFallback className="bg-[#313133] text-white">
-                    {friends?.username?.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col mt-3">
-                  <span className="text-lg font-semibold text-black dark:text-white">{friends?.name}</span>
-                  <span className="text-sm dark:text-gray-400 text-zinc-500">@{friends?.username}</span>
-                </div>
+          <div className="w-[350px] flex flex-col justify-between h-full bg-zinc-400/20 dark:bg-[#2b2d31] border-l border-zinc-400 dark:border-[#1e1f22] flex-shrink-0 overflow-y-auto">
+            <div className="">
+              <div className="w-full h-32 bg-[#5865f2] relative"></div>
+              <div className="absolute top-2 right-2">
+                <Button className="dark:bg-[#1e1f22] bg-zinc-400/30/80 w-8 h-8 rounded-full hover:dark:bg-[#1e1f22] bg-zinc-400/30 cursor-pointer">
+                  <UserCheck size={18} />
+                </Button>
               </div>
+              <div className="relative px-4 pb-4">
+                <div className="flex flex-col -mt-14">
+                  <InforUserImage
+                    image={friends?.image!}
+                    username={friends?.username!}
+                    isOnline={friends?.isOnline!}
+                  />
+                  <div className="flex flex-col mt-3">
+                    <span className="text-lg font-semibold text-black dark:text-white">{friends?.name}</span>
+                    <span className="text-sm dark:text-gray-400 text-zinc-500">@{friends?.username}</span>
+                  </div>
+                </div>
 
-              <div className="mt-6 dark:bg-[#1e1f22] bg-zinc-400/30 rounded-lg p-4">
-                <h3 className="text-xs font-semibold dark:text-gray-400 text-zinc-500 mb-2">SOBRE MIM</h3>
-                <p className="text-sm dark:text-gray-200 text-zinc-600">
-                  {friends?.description || "Nenhuma descrição fornecida."}
-                </p>
+                <div className="mt-6 dark:bg-[#1e1f22] bg-zinc-400/30 rounded-lg p-4">
+                  <h3 className="text-xs font-semibold dark:text-gray-400 text-zinc-500 mb-2">SOBRE MIM</h3>
+                  <p className="text-sm dark:text-gray-200 text-zinc-600">
+                    {friends?.description || "Nenhuma descrição fornecida."}
+                  </p>
 
-                <div className="mt-6 pt-4 border-t border-[#3f4248]">
-                  <h3 className="text-xs font-semibold dark:text-gray-400 text-zinc-500 mb-2">INFORMAÇÕES</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-xs dark:text-gray-400 text-zinc-500">Membro desde</p>
-                      <p className="text-sm dark:text-gray-200 text-zinc-600">
-                        {formatDateComplete(new Date(friends?.createdAt || ""))}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs dark:text-gray-400 text-zinc-500">?.isOnline</p>
-                      <p className="text-sm dark:text-gray-200 text-zinc-600">
-                        {friends?.isOnline || "Offline"}
-                      </p>
+                  <div className="mt-6 pt-4 border-t border-[#3f4248]">
+                    <h3 className="text-xs font-semibold dark:text-gray-400 text-zinc-500 mb-2">INFORMAÇÕES</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xs dark:text-gray-400 text-zinc-500">Membro desde</p>
+                        <p className="text-sm dark:text-gray-200 text-zinc-600">
+                          {formatDateComplete(new Date(friends?.createdAt || ""))}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-
-              <div className="mt-4">
-                <Button className="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white">
-                  Enviar mensagem
-                </Button>
-              </div>
+            </div>
+            <div className="border-t border-zinc-700 w-full flex items-center justify-center">
+              <button className="w-full cursor-pointer text-center dark:text-zinc-300 text-zinc-500 dark:hover:text-zinc-100 hover:text-zinc-900 py-2 text-sm font-semibold transition-colors duration-200">
+                <span>Ver Perfil Completo</span>
+              </button>
             </div>
           </div>
         )}

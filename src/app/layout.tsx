@@ -2,6 +2,7 @@ import CustomLayout from "@/components/custom-layout";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
+import { OnlineStatusProvider } from "@/contexts/OnlineStatusProvider";
 import {
   ClerkProvider
 } from '@clerk/nextjs';
@@ -31,7 +32,9 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              {children}
+              <OnlineStatusProvider>
+                {children}
+              </OnlineStatusProvider>
               <Toaster />
             </ThemeProvider>
           </body>

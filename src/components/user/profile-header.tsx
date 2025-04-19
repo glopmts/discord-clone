@@ -25,7 +25,6 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
 
   const [isMic, setMic] = useState(false);
   const [isHeadphone, setHeadphone] = useState(false);
-  const [isOnline, setOnline] = useState(false);
   const [isModal, setModal] = useState(false);
   const [isScreen, setFullScreen] = useState(false);
   const [isModalEdite, setModalEdite] = useState(false);
@@ -70,7 +69,7 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
                       {user?.username?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`absolute bottom-0 top-5 right-0 ${isOnline ? "bg-green-500" : "bg-zinc-600"} border-2 border-zinc-900 p-1.5 rounded-full`}></div>
+                  <div className={`absolute bottom-0 top-5 right-0 ${user?.isOnline ? "bg-green-500" : "bg-zinc-600"} border-2 border-zinc-900 p-1.5 rounded-full`}></div>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{user?.name}</span>
@@ -99,7 +98,7 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
           userId={userId}
           username={user?.username!}
           image={user?.image!}
-          isOnline={isOnline}
+          isOnline={user?.isOnline!}
           onEditProfile={handleEditProfile}
         />
       )}
@@ -110,7 +109,7 @@ const ProfileHeader = ({ userId }: UserIdProps) => {
           onClose={() => setFullScreen(false)}
           userId={userId}
           user={user!}
-          isOnline={isOnline}
+          isOnline={user?.isOnline!}
         />
       )}
 
