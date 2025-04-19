@@ -83,7 +83,7 @@ export default function GenericModal({
             disabled={loader}
             className="bg-[#4553BE] text-white hover:bg-[#4553BE]/90 disabled:bg-gray-500 disabled:cursor-not-allowed"
           >
-            {loader ? "Processando..." : "Confirmar"}
+            {loader ? <span className="animate-pulse">Processando...</span> : "Confirmar"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -4,7 +4,7 @@ import { getMessagesFriends } from "@/app/actions/menssagens";
 import { getServersByUserId } from "@/app/actions/servers";
 import { deleteMessageFriends, getUserById } from "@/app/actions/user";
 import { IconBar } from "@/components/icons/IcnonsListFriends";
-import LoadingScreen from "@/components/loadingScree";
+import LoadingScreen from "@/components/loadingScreen";
 import InputMenssagens from "@/components/servers/messages/input-menssagens";
 import RenderMessagens from "@/components/servers/messages/message-content-render";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

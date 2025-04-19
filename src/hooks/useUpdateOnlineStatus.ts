@@ -1,25 +1,35 @@
 "use client"
 
-import { updateOnlineStatus } from '@/app/actions/user'
 import { useOnlineStatus } from '@/contexts/OnlineStatusProvider'
 import { useAuth } from '@clerk/nextjs'
 import { useEffect } from 'react'
 
-export function useUpdateOnlineStatus() {
-  const { isOnline } = useOnlineStatus()
+export function useSyncOnlineStatus() {
+  const { isOnline, isPageVisible } = useOnlineStatus()
   const { userId } = useAuth()
 
   useEffect(() => {
     if (!userId) return
 
-    const updateStatus = async () => {
+    const syncStatus = async () => {
+      const actualStatus = isOnline && isPageVisible
+
       try {
-        await updateOnlineStatus(userId, isOnline)
+        await fetch('/api/user/update-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: actualStatus, userId }),
+          keepalive: true // Para garantir que a requisição seja enviada mesmo se a aba for fechada
+        })
       } catch (error) {
-        console.error('Failed to update online status:', error)
+        console.error('Sync failed:', error)
       }
     }
 
-    updateStatus()
-  }, [isOnline, userId])
+    syncStatus()
+
+    const interval = setInterval(syncStatus, 30000) // A cada 30 segundos
+
+    return () => clearInterval(interval)
+  }, [isOnline, isPageVisible, userId])
 }

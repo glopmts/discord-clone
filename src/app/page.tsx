@@ -1,6 +1,6 @@
 "use client";
 
-import LoadingScreen from "@/components/loadingScree";
+import LoadingScreen from "@/components/loadingScreen";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

@@ -2,7 +2,7 @@
 
 import { geServerCode, joinServer } from "@/app/actions/servers";
 import { getUserByClerkId } from "@/app/actions/user";
-import LoadingScreen from "@/components/loadingScree";
+import LoadingScreen from "@/components/loadingScreen";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/nextjs";

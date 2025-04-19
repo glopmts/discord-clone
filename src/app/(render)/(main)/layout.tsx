@@ -4,7 +4,7 @@ import Header from "@/components/Header"
 import SiderBarInfors from "@/components/servers/sideBar-Infor-Servers"
 import SideBarServes from "@/components/servers/sideBar-servers"
 import ProfileHeader from "@/components/user/profile-header"
-import { useUpdateOnlineStatus } from "@/hooks/useUpdateOnlineStatus"
+import { useSyncOnlineStatus } from "@/hooks/useUpdateOnlineStatus"
 import { useAuth } from "@clerk/nextjs"
 
 export default function DasherboardLayout({
@@ -13,7 +13,7 @@ export default function DasherboardLayout({
   children: React.ReactNode
 }) {
   const { userId } = useAuth();
-  useUpdateOnlineStatus()
+  useSyncOnlineStatus()
 
   if (!userId) {
     return null

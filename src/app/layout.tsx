@@ -1,6 +1,6 @@
-import CustomLayout from "@/components/custom-layout";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import CustomLayout from "@/contexts/custom-layout";
 
 import { OnlineStatusProvider } from "@/contexts/OnlineStatusProvider";
 import {

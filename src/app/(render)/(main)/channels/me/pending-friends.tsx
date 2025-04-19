@@ -1,4 +1,5 @@
 import { canceleFriends, getPendingFriendRequests } from "@/app/actions/user";
+import ErrorMenssage from "@/components/ErrorMenssage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { UserIdProps } from "@/types/interfaces";
@@ -79,6 +80,7 @@ const PendingFriends = ({ userId }: UserIdProps) => {
           )
         })
       )}
+      <ErrorMenssage error={error?.message} />
     </div>
   );
 }

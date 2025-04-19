@@ -12,7 +12,7 @@ import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import LoadingScreen from "../loadingScree";
+import LoadingScreen from "../loadingScreen";
 import ConviteUserServer from "../modals/convite-users-server";
 import ModalCreateServer from "../modals/modal-news-servers";
 import RenderSideBarServer from "./sideBar-Servers-Render";

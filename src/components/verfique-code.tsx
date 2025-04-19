@@ -3,6 +3,7 @@
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/services/auth/authServices"
 import { type FC, useState } from "react"
+import ErrorMenssage from "./ErrorMenssage"
 
 type VerifyCodeProps = {
   text: string
@@ -67,7 +68,7 @@ const VerifyCode: FC<VerifyCodeProps> = ({
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />
-        {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+        {error && <ErrorMenssage error={error} />}
       </div>
 
       <button

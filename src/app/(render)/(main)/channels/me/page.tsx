@@ -1,6 +1,6 @@
 "use client";
 
-import LoadingScreen from "@/components/loadingScree";
+import LoadingScreen from "@/components/loadingScreen";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
 import { MessageCirclePlus, Users } from "lucide-react";
