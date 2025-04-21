@@ -6,7 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { CircleHelp, Inbox, LucideUsers, User, UserPlusIcon } from "lucide-react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import ModalInfor from "./modals/ModalCustom";
@@ -19,6 +19,8 @@ const Header = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname()
+  const directPage = pathname.startsWith("/channels/me");
 
   const { data: server } = useQuery({
     queryKey: ["server", id],
@@ -79,13 +81,23 @@ const Header = () => {
             <ButtonsOptions onMenuClick={toggleMenu} hasPending={!!pendings?.length} />
           </>
         ) : (
-          <>
-            <div className="flex items-center gap-1.5">
-              <LucideUsers size={16} className="text-neutral-300" />
-              <span className="font-semibold text-sm">Amigos</span>
-            </div>
-            <ButtonsOptions onMenuClick={toggleMenu} hasPending={!!pendings?.length} />
-          </>
+          directPage ? (
+            <>
+              <div className="flex items-center gap-1.5">
+                <Image src="/favicon.ico" alt="Logo" width={20} height={20} className="object-cover" />
+                <span className="font-semibold text-sm text-zinc-400">Menssagens diretas</span>
+              </div>
+              <div className=""></div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-1.5">
+                <LucideUsers size={16} className="text-neutral-300" />
+                <span className="font-semibold text-sm">Amigos</span>
+              </div>
+              <ButtonsOptions onMenuClick={toggleMenu} hasPending={!!pendings?.length} />
+            </>
+          )
         )}
       </div>
 
@@ -146,7 +158,7 @@ const FriendRequestItem = ({
   const friend = isRequester ? request.addressee : request.requester;
 
   return (
-    <div className="flex items-center bg-zinc-400 justify-between p-2 hover:bg-zinc-700/30 rounded-md">
+    <div className="flex items-center bg-zinc-200 shadow dark:bg-zinc-700/20 justify-between p-2 hover:bg-zinc-700/30 rounded-md">
       <div className="flex items-center gap-3">
         <Avatar className="w-10 h-10 border">
           <AvatarImage src={friend.image} alt={friend.username} />
@@ -161,10 +173,10 @@ const FriendRequestItem = ({
       </div>
       {!isRequester && (
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => handleAcept(friend.clerk_id)} size="sm" className="bg-green-600 hover:bg-green-700">
+          <Button variant="outline" onClick={() => handleAcept(friend.clerk_id)} size="sm" className="bg-green-600 hover:bg-green-700 border-0 text-white">
             Aceitar
           </Button>
-          <Button variant="outline" size="sm" className="bg-zinc-700 hover:bg-zinc-600">
+          <Button variant="destructive" size="sm">
             Recusar
           </Button>
         </div>

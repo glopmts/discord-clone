@@ -1,4 +1,4 @@
-import DetailsFriendsModal from "@/components/modals/details-user-modal";
+import DetailsFriendsModal from "@/components/modals/user-directmessages-modal";
 import { Button } from "@/components/ui/button";
 import InforUserImage from "@/components/user/infor-user-image";
 import useDominantColor from "@/hooks/useDominantColor";
@@ -8,8 +8,8 @@ import { UserCheck } from "lucide-react";
 import { useState } from "react";
 
 type UserProps = {
-  friends: User
-}
+  friends: User;
+};
 
 const SideBarRightUser = ({ friends }: UserProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,7 +17,7 @@ const SideBarRightUser = ({ friends }: UserProps) => {
 
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);
-  }
+  };
 
   return (
     <>

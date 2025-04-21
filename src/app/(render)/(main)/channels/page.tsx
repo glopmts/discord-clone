@@ -291,7 +291,7 @@ const Channels = () => {
           {/* Lista de membros */}
           {memBersList && (
             <div className="w-[240px] h-full border-l px-1">
-              <ScrollArea className="flex-1 w-full h-32 mb-15">
+              <ScrollArea className="flex-1 w-full h-full mb-15">
                 {loaderServer ? (
                   <div className="w-full h-28 flex items-center justify-center">
                     <Loader size={28} className="animate-spin dark:dark:text-[#949ba4]" />

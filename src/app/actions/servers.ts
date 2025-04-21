@@ -84,6 +84,11 @@ export async function geServer(id: string) {
                 MemberCargo: true
               }
             },
+          },
+          orderBy: {
+            user: {
+              name: "asc"
+            }
           }
         },
         MemberCargo: true,

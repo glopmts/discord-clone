@@ -5,9 +5,9 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useMenuModalHandler } from "@/hooks/useMenuModalHandler";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { useState } from "react";
 import { optionsContextMenuSever } from "../infor-bar/context-menu-options";
 
 type RenderServersProps = {
@@ -40,14 +40,12 @@ const RenderSideBarServer = ({
   handleServerClick,
   userId,
 }: RenderServersProps) => {
-  const [contextMenuOpen, setContextMenuOpen] = useState<string | null>(null);
-
-  const handleCloseMenu = () => {
-    setContextMenuOpen(null);
-  };
+  const { setContextMenuOpen, withMenuHandler } = useMenuModalHandler();
 
   const handleItemClick = (itemOnClick: (closeMenu: () => void) => void) => {
-    itemOnClick(handleCloseMenu);
+    withMenuHandler(() => {
+      itemOnClick(() => setContextMenuOpen(null));
+    });
   };
 
   return (
@@ -57,7 +55,7 @@ const RenderSideBarServer = ({
           const isActive = currentServerId === server.id
           return (
             <ContextMenu
-              key={contextMenuOpen}
+              key={server.id}
               onOpenChange={(open) => {
                 setContextMenuOpen(open ? server.id : null);
               }}

@@ -110,11 +110,11 @@ export default function ConviteClient() {
         <div className="w-full h-full px-6 py-4" style={{ backgroundImage: "url('/images/backgroundAuth.svg')", backgroundSize: 'cover' }}>
           <div className="flex items-center gap-2">
             <Image src="/images/discord-white.png" alt="Logo" width={40} height={40} />
-            <h2 className="font-semibold text-xl">Discord Clone</h2>
+            <h2 className="font-semibold text-xl text-white">Discord Clone</h2>
           </div>
 
           <div className="w-full h-full flex items-center justify-center">
-            <div className="w-[460px] h-[405px] rounded-[8px] bg-[#323339] flex flex-col justify-between">
+            <div className="w-[460px] h-[405px] bg-background rounded-[8px] dark:bg-[#323339] flex flex-col justify-between">
               <div className="flex items-center justify-center flex-col gap-0.5 p-4">
                 <div className="flex items-center justify-center">
                   <Avatar className={cn("w-17 h-17 border")}>
@@ -125,7 +125,7 @@ export default function ConviteClient() {
                   </Avatar>
                 </div>
                 <div className="mt-1 flex flex-col items-center gap-1.5">
-                  <span className="text-zinc-400 font-semibold">Convidou você para se ajuntar</span>
+                  <span className="dark:text-zinc-400 text-zinc-500 font-semibold">Convidou você para se ajuntar</span>
                   <div className="flex items-center gap-1.5">
                     <Avatar className={cn("w-10 h-10 border rounded-md")}>
                       <AvatarImage src={server.image} />
@@ -140,18 +140,18 @@ export default function ConviteClient() {
                   <div className="mt-0.5 flex items-center gap-3">
                     <div className="flex items-center gap-1">
                       <div className="bg-green-600 w-2 h-2 rounded-full"></div>
-                      <span className="text-zinc-300 text-sm">{0} online</span>
+                      <span className="dark:text-zinc-300 text-sm">{0} online</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <div className="bg-zinc-300 w-2 h-2 rounded-full"></div>
-                      <span className="text-zinc-300 text-sm">{server.members} membros</span>
+                      <span className="dark:text-zinc-300 text-sm">{server.members} membros</span>
                     </div>
                   </div>
                 </div>
                 <div className="mt-4 w-[380px]">
-                  <div className="h-21 flex items-center px-4 rounded-[8px] border bg-zinc-700">
-                    <div className="flex items-center gap-2 text-zinc-300">
-                      <div className="p-2 bg-zinc-800 rounded-full">
+                  <div className="h-21 flex items-center px-4 rounded-[8px] bg-zinc-300 border dark:bg-zinc-700">
+                    <div className="flex items-center gap-2 dark:text-zinc-300">
+                      <div className="p-2 dark:bg-zinc-800 bg-zinc-400 rounded-full">
                         <Settings size={23} />
                       </div>
                       <div className="flex flex-col">
@@ -163,7 +163,7 @@ export default function ConviteClient() {
                 </div>
               </div>
               <div className="w-full flex items-center justify-center p-4">
-                <button className={`w-[380px] rounded-[8px] p-2 bg-[#4d5dd1] ${isLoadCreate ? "opacity-35 cursor-default" : "cursor-pointer hover:bg-[#4654c0bd] transition-all"}`} disabled={isLoadCreate || isLoading} onClick={handleJoin}>
+                <button className={`w-[380px] text-white rounded-[8px] p-2 bg-[#4d5dd1] ${isLoadCreate ? "opacity-35 cursor-default" : "cursor-pointer hover:bg-[#4654c0bd] transition-all"}`} disabled={isLoadCreate || isLoading} onClick={handleJoin}>
                   <span className="w-full text-center flex items-center justify-center">
                     {isLoadCreate ? <Loader size={20} className="animate-spin" /> : "Aceitar convite"}
                   </span>

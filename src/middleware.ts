@@ -18,7 +18,8 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   if (userId && isPublicRoute(req)) {
-    return NextResponse.redirect(new URL('/channels/me', req.url))
+    const redirectUrl = req.nextUrl.searchParams.get('redirect_url')
+    return NextResponse.redirect(new URL(redirectUrl || '/channels/me', req.url))
   }
 
   return NextResponse.next()

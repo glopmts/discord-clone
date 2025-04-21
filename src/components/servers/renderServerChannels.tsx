@@ -1,5 +1,6 @@
 import { updateActiveCategory } from "@/app/actions/category"
 import { getUnreadMessagesCount, markMessagesChannelRead } from "@/app/actions/menssagens"
+import { useMenuModalHandler } from "@/hooks/useMenuModalHandler"
 import { InterfacesRender } from "@/types/interfaces"
 import { Calendar, LucideListMinus, Plus, Users } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -95,7 +96,7 @@ const RenderServerChannels = ({
   const router = useRouter();
   const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set());
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
-  const [contextMenuOpen, setContextMenuOpen] = useState<string | null>(null);
+  const { setContextMenuOpen, withMenuHandler } = useMenuModalHandler();
 
   // Inicializa com categorias ativas
   useEffect(() => {
@@ -146,10 +147,10 @@ const RenderServerChannels = ({
     }
   };
 
-  const handleCloseMenu = () => setContextMenuOpen(null);
-
   const handleItemClick = (itemOnClick: (closeMenu: () => void) => void) => {
-    itemOnClick(handleCloseMenu);
+    withMenuHandler(() => {
+      itemOnClick(() => setContextMenuOpen(null));
+    });
   };
 
   const handleToggleCategory = async (categoryId: string) => {
@@ -209,7 +210,7 @@ const RenderServerChannels = ({
                     className="w-full border-none"
                   >
                     <ContextMenu
-                      key={contextMenuOpen}
+                      key={category.id}
                       onOpenChange={(open) => setContextMenuOpen(open ? category.id : null)}
                     >
                       <ContextMenuTrigger>

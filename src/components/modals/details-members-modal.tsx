@@ -35,6 +35,7 @@ const DetailsMembers = ({
   serverId,
   onClose
 }: MenuDetailsProps) => {
+
   if (!memberId) {
     return null;
   }

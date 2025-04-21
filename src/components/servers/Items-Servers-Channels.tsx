@@ -44,7 +44,6 @@ export const MenuItemsInforServer = ({
   const [isLoading, setIsLoading] = useState(true);
   const { setContextMenuOpen, withMenuHandler } = useMenuModalHandler();
 
-
   useEffect(() => {
     const loadMenuItems = async () => {
       const isAdmin = await hasAnyPermission(userId, serverId, ['owner', 'admin', 'moderator']);

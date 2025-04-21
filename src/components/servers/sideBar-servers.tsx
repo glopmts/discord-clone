@@ -18,10 +18,10 @@ import ModalCreateServer from "../modals/modal-news-servers";
 import RenderSideBarServer from "./sideBar-Servers-Render";
 
 const SideBarServers = ({ userId }: UserIdProps) => {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const currentServerId = searchParams.get('id')
-  const pathname = usePathname()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentServerId = searchParams.get('id');
+  const pathname = usePathname();
   const isUserPage = pathname.startsWith("/channels/me");
   const [modalCreate, setModalCreate] = useState(false);
   const [modalConviter, setModalConviter] = useState(false);

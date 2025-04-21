@@ -80,11 +80,11 @@ const LoginPage = () => {
           context="signIn"
         />
       ) : (
-        <div className="bg-[#313338] p-8 max-w-[784px] w-full rounded-md shadow-xl flex flex-col md:flex-row gap-8">
+        <div className="dark:bg-[#313338] bg-background p-8 max-w-[784px] w-full rounded-md shadow-xl flex flex-col md:flex-row gap-8">
           {/* Left side - Login form */}
           <div className="w-full md:w-1/2 flex flex-col">
             <div className="mb-6 flex flex-col items-center text-center">
-              <h1 className="font-bold text-2xl text-white">Boas-vindas de volta!</h1>
+              <h1 className="font-bold text-2xl">Boas-vindas de volta!</h1>
               <span className="text-[#B5BAC1] text-base">Estamos muito animados em te ver novamente!</span>
             </div>
 

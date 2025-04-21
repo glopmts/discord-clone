@@ -55,16 +55,16 @@ const VerifyCode: FC<VerifyCodeProps> = ({
   };
 
   return (
-    <div className="w-full bg-[#313338] p-8 max-w-[484px] rounded-md shadow-xl">
+    <div className="w-full dark:bg-[#313338] p-8 max-w-[484px] rounded-md shadow-xl">
       <div className="mb-6 flex flex-col items-center text-center">
-        <h1 className="font-bold text-2xl text-white">Verifique seu código</h1>
+        <h1 className="font-bold text-2xl">Verifique seu código</h1>
         {text && <p className="text-[#B5BAC1] mt-2">{text}</p>}
       </div>
 
       <div className="mb-4 mt-4">
         <Input
           placeholder="Digite o código de verificação"
-          className="bg-[#151616] h-10 text-white"
+          className="dark:bg-[#242525] h-10"
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />

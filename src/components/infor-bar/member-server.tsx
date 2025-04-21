@@ -1,4 +1,5 @@
 import { getRoleIcon } from "@/components/icons/IconsCargosMembers";
+import { useMenuModalHandler } from "@/hooks/useMenuModalHandler";
 import { canDeletePermission } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { MenuItem, ServerPropsMember } from "@/types/interfaces";
@@ -13,12 +14,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 const MemberServer = ({ server, currentUserId, handleExpulseMember }: ServerPropsMember) => {
   const [isOpen, setOpen] = useState(false);
   const [selectMember, setSelectMember] = useState<string | null>(null);
-  const [contextMenuOpen, setContextMenuOpen] = useState<string | null>(null);
+  const { setContextMenuOpen, withMenuHandler } = useMenuModalHandler();
 
   const handleInfor = (id: string) => {
-    setOpen(!isOpen);
-    setSelectMember(id);
-    setContextMenuOpen(null);
+    withMenuHandler(() => {
+      setOpen(!isOpen);
+      setSelectMember(id);
+    });
   };
 
   const getMemberRole = (memberId: string): Roles => {
@@ -56,24 +58,24 @@ const MemberServer = ({ server, currentUserId, handleExpulseMember }: ServerProp
   };
 
   return (
-    <div className="p-2">
+    <div className="p-2 h-full">
       {server?.members?.length > 0 && (
-        <div className="mt-4">
+        <div className="mt-4 w-full h-full">
           <div className="px-3 flex items-center justify-between group">
             <span className="text-xs uppercase font-semibold text-neutral-400 group-hover:text-neutral-200">
               Membros — {server.members.length}
             </span>
           </div>
-          <div className="mt-2">
+          <div className="mt-2 h-full">
             {server.members.map((member) => {
               const memberRole = getMemberRole(member.id);
               const canDelete = canDeletePermission(currentUserId, member as any, server as any);
 
               return (
                 <ContextMenuGlobe
-                  key={contextMenuOpen}
+                  key={member.id}
                   menuItems={getMemberContextMenuItems(
-                    member.id,
+                    member.user.clerk_id!,
                     canDelete
                   )}
                   onOpenChange={(open) => {

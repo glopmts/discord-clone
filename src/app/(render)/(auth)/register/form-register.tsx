@@ -5,7 +5,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useUsernameCheck } from "@/hooks/useUsernameCheck";
 import { registerSchema } from "@/lib/validators";
+import { days, months } from "@/types/dates-list";
 import { useClerk, useSignUp } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -19,11 +21,18 @@ interface RegisterFormProps {
   onSuccess: (email: string) => void;
 }
 
-
 const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { signUp } = useSignUp();
   const { loaded } = useClerk();
+  const {
+    username,
+    setUsername,
+    isChecking,
+    isAvailable,
+    isValid
+  } = useUsernameCheck();
+
 
   const form = useForm<FormValues>({
     resolver: zodResolver(registerSchema),
@@ -38,6 +47,14 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       marketingEmails: false,
     },
   });
+
+
+  form.watch((value) => {
+    if (value.username) {
+      setUsername(value.username);
+    }
+  });
+
 
   const onSubmit = async (data: FormValues) => {
     if (!signUp || !loaded) return;
@@ -55,7 +72,6 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         birthDate: `${data.birthYear}-${data.birthMonth}-${data.birthDay}`,
         marketingEmails: data.marketingEmails
       }));
-
 
       await signUp.create({
         emailAddress: data.email,
@@ -91,27 +107,11 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     }
   };
 
-  const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
-  const months = [
-    { value: "1", label: "Janeiro" },
-    { value: "2", label: "Fevereiro" },
-    { value: "3", label: "Março" },
-    { value: "4", label: "Abril" },
-    { value: "5", label: "Maio" },
-    { value: "6", label: "Junho" },
-    { value: "7", label: "Julho" },
-    { value: "8", label: "Agosto" },
-    { value: "9", label: "Setembro" },
-    { value: "10", label: "Outubro" },
-    { value: "11", label: "Novembro" },
-    { value: "12", label: "Dezembro" },
-  ];
-
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => (currentYear - i).toString());
 
   return (
-    <div className="w-full max-w-md p-8 rounded-md bg-[#313338] text-white">
+    <div className="w-full max-w-md p-8 bg-background rounded-md dark:bg-[#313338]">
       <h1 className="text-2xl font-bold text-center mb-6">Criar uma conta</h1>
 
       <Form {...form}>
@@ -127,7 +127,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
                   </label>
                 </div>
                 <FormControl>
-                  <Input {...field} className="bg-[#1E1F22] border-none text-white" />
+                  <Input {...field} className="dark:bg-[#1E1F22] border-none" />
                 </FormControl>
                 <FormMessage className="text-red-400 text-xs" />
               </FormItem>
@@ -143,7 +143,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
                   <label className="text-xs font-semibold uppercase text-[#B5BAC1]">NOME EXIBIDO</label>
                 </div>
                 <FormControl>
-                  <Input {...field} className="bg-[#1E1F22] border-none text-white" />
+                  <Input {...field} className="dark:bg-[#1E1F22] border-none" />
                 </FormControl>
                 <FormMessage className="text-red-400 text-xs" />
               </FormItem>
@@ -161,8 +161,24 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
                   </label>
                 </div>
                 <FormControl>
-                  <Input {...field} className="bg-[#1E1F22] border-none text-white" />
+                  <Input {...field} className="dark:bg-[#1E1F22] border-none" />
                 </FormControl>
+                <div className="relative">
+                  {isChecking && (
+                    <div className="absolute right-3 top-2.5">
+                      <div className="w-5 h-5 border-2 border-t-transparent border-blue-500 rounded-full animate-spin"></div>
+                    </div>
+                  )}
+
+                  {isValid && isAvailable !== null && !isChecking && (
+                    <p className={`text-sm ${isAvailable ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                      {isAvailable
+                        ? 'Nome disponível!'
+                        : 'Este nome já está em uso'}
+                    </p>
+                  )}
+                </div>
                 <FormMessage className="text-red-400 text-xs" />
               </FormItem>
             )}
@@ -179,7 +195,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
                   </label>
                 </div>
                 <FormControl>
-                  <Input {...field} type="password" className="bg-[#1E1F22] border-none text-white" />
+                  <Input {...field} type="password" className="dark:bg-[#1E1F22] border-none" />
                 </FormControl>
                 <FormMessage className="text-red-400 text-xs" />
               </FormItem>
@@ -200,11 +216,11 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
                   <FormItem>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="bg-[#1E1F22] border-none text-white">
+                        <SelectTrigger className="dark:bg-[#1E1F22] border-none">
                           <SelectValue placeholder="Dia" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-[#1E1F22] text-white border-[#1E1F22]">
+                      <SelectContent className="dark:bg-[#1E1F22] border-[#1E1F22]">
                         {days.map((day) => (
                           <SelectItem key={day} value={day}>
                             {day}
@@ -224,11 +240,11 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
                   <FormItem>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="bg-[#1E1F22] border-none text-white">
+                        <SelectTrigger className="dark:bg-[#1E1F22] border-none">
                           <SelectValue placeholder="Mês" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-[#1E1F22] text-white border-[#1E1F22]">
+                      <SelectContent className="dark:bg-[#1E1F22] border-[#1E1F22]">
                         {months.map((month) => (
                           <SelectItem key={month.value} value={month.value}>
                             {month.label}
@@ -248,11 +264,11 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
                   <FormItem>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="bg-[#1E1F22] border-none text-white">
+                        <SelectTrigger className="dark:bg-[#1E1F22] border-none">
                           <SelectValue placeholder="Ano" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-[#1E1F22] text-white border-[#1E1F22] max-h-[200px]">
+                      <SelectContent className="dark:bg-[#1E1F22] border-[#1E1F22] max-h-[200px]">
                         {years.map((year) => (
                           <SelectItem key={year} value={year}>
                             {year}
@@ -293,7 +309,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
 
           <Button
             type="submit"
-            className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white py-3 mt-4"
+            className="w-full bg-[#5865F2] hover:bg-[#4752C4] py-3 mt-4 text-white"
             disabled={isLoading}
           >
             {isLoading ? "Processando..." : "Continuar"}

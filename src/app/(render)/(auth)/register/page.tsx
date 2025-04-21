@@ -1,6 +1,6 @@
 "use client"
 
-import { createUser } from "@/app/actions/user"
+import { createUser } from "@/app/actions/auth"
 import VerifyCode from "@/components/verfique-code"
 import { useAuth } from "@/services/auth/authServices"
 import { useRouter } from "next/navigation"
