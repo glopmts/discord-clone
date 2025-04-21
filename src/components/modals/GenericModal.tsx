@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 import { ModalVariant } from "@/types/interfaces";
 import { ReactNode, useState } from "react";
 
-
 interface GenericModalProps {
   isOpen: boolean;
   onClose: () => void;

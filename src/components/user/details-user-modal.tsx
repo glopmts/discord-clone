@@ -1,3 +1,4 @@
+import useDominantColor from "@/hooks/useDominantColor";
 import { ArrowRight, Edit2, IdCard, User } from "lucide-react";
 import Image from "next/image";
 import { FC, useEffect, useRef } from "react";
@@ -24,6 +25,7 @@ const ModalUserDetails: FC<UserModal> = ({
   onEditProfile
 }) => {
   const modalRef = useRef<HTMLDivElement>(null)
+  const dominantColor = useDominantColor(image!);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -45,7 +47,10 @@ const ModalUserDetails: FC<UserModal> = ({
       className="dark:bg-zinc-800 bg-background shadow-md w-[300px] h-[457px] rounded-md absolute z-[500] flex items-center justify-center bottom-0 top-16 left-4">
       <div className="w-full h-full">
         <div className="overflow-hidden rounded-md relative">
-          <div className="w-full h-24 bg-[#537BA2] relative"></div>
+          <div
+            className="w-full h-28 relative"
+            style={{ backgroundColor: dominantColor }}
+          ></div>
           <div className="p-3 z-[630] -top-12 relative">
             <div className="w-16 h-16 relative">
               {image ? (
@@ -85,11 +90,12 @@ const ModalUserDetails: FC<UserModal> = ({
                 <ArrowRight size={16} className="text-neutral-400" />
               </Button>
               <Separator />
-              <Button variant='ghost' className="flex items-center justify-baseline left-2 w-full gap-2">
+              <Button variant='ghost' className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <IdCard size={20} className="text-neutral-400" />
                   <span className="text-neutral-400">Copiar ID usuário</span>
                 </div>
+                <div className=""></div>
               </Button>
             </div>
           </div>

@@ -10,15 +10,18 @@ import {
 import { assignServerRole } from "@/app/actions/member-servers";
 import { getRoleIcon } from "@/components/icons/IconsCargosMembers";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import useDominantColor from "@/hooks/useDominantColor";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/clerk-react";
 import { FriendStatus, Roles } from "@prisma/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Ban, Check, Loader, MoreVertical, Shield, Star, User2, UserPlus2Icon, UserRoundCog } from "lucide-react";
+import { Loader, MoreVertical, Shield, Star, User2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import ErrorMenssage from "../ErrorMenssage";
+import { getStatusButton } from "../getStatusButton";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
+
 type MenuDetailsProps = {
   memberId: string;
   serverId: string;
@@ -62,6 +65,8 @@ const DetailsMembers = ({
     if (!memberCargo || memberCargo.length === 0) return Roles.user;
     return memberCargo[0].role;
   };
+
+  const dominantColor = useDominantColor(member?.image!);
 
   useEffect(() => {
     if (memberId && userId) {
@@ -108,57 +113,6 @@ const DetailsMembers = ({
     }
   };
 
-  const getStatusButton = () => {
-    if (isLoadingStatus) {
-      return (
-        <Button disabled className="rounded-full w-8 h-8 bg-background dark:bg-zinc-800/60">
-          <Loader size={16} className="animate-spin" />
-        </Button>
-      );
-    }
-
-    switch (friendshipStatus) {
-      case "PENDING":
-        return (
-          <Button title="Pedido pendente..." disabled className="rounded-full w-8 h-8 bg-yellow-600/60">
-            <UserRoundCog size={16} className="text-white" />
-          </Button>
-        );
-      case "ACCEPTED":
-        return (
-          <Button disabled className="rounded-full w-8 h-8 bg-green-600">
-            <Check size={16} className="text-white" />
-          </Button>
-        );
-      case "FRIENDS":
-        return (
-          <Button disabled className="rounded-full w-8 h-8 bg-green-600">
-            <Check size={16} className="text-white" />
-          </Button>
-        );
-      case "BLOCKED":
-        return (
-          <Button disabled className="rounded-full w-8 h-8 bg-red-600/100">
-            <Ban size={16} className="text-white" />
-          </Button>
-        );
-      default:
-        return (
-          <Button
-            onClick={handleAddFriend}
-            className="rounded-full w-8 h-8 bg-background dark:bg-zinc-800/60 hover:bg-zinc-700/30 text-white"
-            disabled={addFriendMutation.isPending}
-          >
-            {addFriendMutation.isPending ? (
-              <Loader size={16} className="animate-spin text-white" />
-            ) : (
-              <UserPlus2Icon size={16} />
-            )}
-          </Button>
-        );
-    }
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={cn("p-0 overflow-hidden z-[200] bg-background dark:bg-zinc-800 w-[500px] h-[480px]")}>
@@ -166,7 +120,7 @@ const DetailsMembers = ({
         <div className="w-full">
           {error && (
             <div className="w-full h-full text-center text-red-500">
-              {error.message}
+              <ErrorMenssage error={error.message} />
             </div>
           )}
           {isLoading ? (
@@ -176,7 +130,10 @@ const DetailsMembers = ({
           ) : (
             <div className="w-full h-full">
               <div className="w-full relative">
-                <div className="w-full h-32 bg-blue-600 relative"></div>
+                <div
+                  className="w-full h-32 relative"
+                  style={{ backgroundColor: dominantColor }}
+                ></div>
                 <div className="p-2 flex flex-col gap-2.5 relative -top-8 z-40">
                   <div className="h-18 w-18 rounded-full flex items-center justify-between">
                     <Avatar className="h-21 w-21 p-1 rounded-full relative bg-zinc-700">
@@ -186,7 +143,12 @@ const DetailsMembers = ({
                       </AvatarFallback>
                     </Avatar>
                     <div className="z-50 absolute top-0 left-23">
-                      {getStatusButton()}
+                      {getStatusButton({
+                        isLoadingStatus,
+                        friendshipStatus: friendshipStatus!,
+                        addFriendMutation,
+                        handleAddFriend
+                      })}
                     </div>
                   </div>
                   <div className="flex flex-col p-2">

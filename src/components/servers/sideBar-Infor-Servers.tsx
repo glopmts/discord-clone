@@ -47,7 +47,6 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     variant: null,
   });
 
-
   const { setContextMenuOpen, withMenuHandler } = useMenuModalHandler();
 
   const [formData, setFormData] = useState<{
@@ -301,34 +300,11 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
     setModalConviter(true);
   };
 
-
-
   return (
     <div>
-      <ContextMenuGlobe
-        // Ensures the menu closes properly without freezing the screen
-        onOpenChange={(open) => {
-          setContextMenuOpen(open ? id : null);
-        }}
-        className="w-auto"
-        menuItems={[
-          {
-            label: "Convidar pessoas",
-            action: () => withMenuHandler(() => handleConviteServer({
-              id: id!,
-              inviteCode: server?.inviteCode!,
-              name: server?.name || "Server"
-            })),
-          },
-          {
-            label: "Criar um canal",
-            action: () => withMenuHandler(() => handleNewsChannel())
-          },
-          {
-            label: "Criar categoria",
-            action: () => withMenuHandler(() => handleNewsCategory()),
-          }
-        ]}>
+      <div
+        className="w-full h-full"
+      >
         <div className="w-[290px] z-[500] h-full border rounded-l-md flex flex-col">
           {error && (
             <div className="text-center text-base font-semibold text-red-500">
@@ -344,49 +320,75 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
                 <Skeleton className="h-6 w-1/2" />
               </div>
             ) : server ? (
-              <>
-                <div className="p-3 flex items-center justify-between">
-                  <MenuOptionsInfor
-                    name={server.name}
-                    handleNewsCategory={handleNewsCategory}
-                    handleNewsChannel={handleNewsChannel}
-                  />
-                </div>
-                <div className="w-full h-[72vh] overflow-y-auto scroll-style">
-                  {/* Render channels that belong to a category */}
-                  <RenderServerChannels
-                    server={server}
-                    userId={userId}
-                    currentChannelId={currentChannelId!}
-                    handleNewsChannel={handleNewsChannel}
-                    handleNewsCategory={handleNewsCategory}
-                    handleServerClick={handleChannelClick}
-                    handleDelete={handleDeleteCategory}
-                    handleEditeCategory={handleEditeCategory}
-                    handleDeleteChannel={handleDeleteChannel}
-                    handleEditChannel={handleEditChannel}
-                  />
+              // Ensures the menu closes properly without freezing the screen
+              <ContextMenuGlobe
+                onOpenChange={(open) => {
+                  setContextMenuOpen(open ? id : null);
+                }}
+                className="w-auto"
+                menuItems={[
+                  {
+                    label: "Convidar pessoas",
+                    action: () => withMenuHandler(() => handleConviteServer({
+                      id: id!,
+                      inviteCode: server?.inviteCode!,
+                      name: server?.name || "Server"
+                    })),
+                  },
+                  {
+                    label: "Criar um canal",
+                    action: () => withMenuHandler(() => handleNewsChannel())
+                  },
+                  {
+                    label: "Criar categoria",
+                    action: () => withMenuHandler(() => handleNewsCategory()),
+                  }
+                ]}
+              >
+                <div className="">
+                  <div className="p-3 flex items-center justify-between">
+                    <MenuOptionsInfor
+                      name={server.name}
+                      handleNewsCategory={handleNewsCategory}
+                      handleNewsChannel={handleNewsChannel}
+                    />
+                  </div>
+                  <div className="w-full h-[72vh] overflow-y-auto scroll-style">
+                    {/* Render channels that belong to a category */}
+                    <RenderServerChannels
+                      server={server}
+                      userId={userId}
+                      currentChannelId={currentChannelId!}
+                      handleNewsChannel={handleNewsChannel}
+                      handleNewsCategory={handleNewsCategory}
+                      handleServerClick={handleChannelClick}
+                      handleDelete={handleDeleteCategory}
+                      handleEditeCategory={handleEditeCategory}
+                      handleDeleteChannel={handleDeleteChannel}
+                      handleEditChannel={handleEditChannel}
+                    />
 
-                  <div className="flex flex-col gap-1.5 p-1.5">
-                    {/* Render channels that do not belong to any category */}
-                    {server.channels
-                      .filter(channel => !channel.categoryId)
-                      .map((channel) => (
-                        <MenuItemsInforServer
-                          key={channel.id}
-                          userId={userId}
-                          serverId={server.id}
-                          server={server}
-                          currentChannelId={currentChannelId!}
-                          onEdit={handleEditChannel}
-                          onDelete={handleDeleteChannel}
-                          onServerClick={handleServerClick}
-                          channel={channel}
-                        />
-                      ))}
+                    <div className="flex flex-col gap-1.5 p-1.5">
+                      {/* Render channels that do not belong to any category */}
+                      {server.channels
+                        .filter(channel => !channel.categoryId)
+                        .map((channel) => (
+                          <MenuItemsInforServer
+                            key={channel.id}
+                            userId={userId}
+                            serverId={server.id}
+                            server={server}
+                            currentChannelId={currentChannelId!}
+                            onEdit={handleEditChannel}
+                            onDelete={handleDeleteChannel}
+                            onServerClick={handleServerClick}
+                            channel={channel}
+                          />
+                        ))}
+                    </div>
                   </div>
                 </div>
-              </>
+              </ContextMenuGlobe>
             ) : (
               loaderMessages ? (
                 <div className="w-full flex items-center gap-1.5">
@@ -401,7 +403,7 @@ const SiderBarInfors = ({ userId }: UserIdProps) => {
             )}
           </div>
         </div>
-      </ContextMenuGlobe>
+      </div>
 
       <GenericModal
         isOpen={modalState.isOpen}

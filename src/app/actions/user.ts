@@ -331,6 +331,41 @@ export async function acceptFriends(userId: string, addressee: string) {
   }
 }
 
+export async function deleteFriendship(userId: string, friendId: string) {
+  try {
+    if (!userId || !friendId) {
+      throw new Error("User ID and Friend ID are required!");
+    }
+
+    const friendship = await db.friendship.findFirst({
+      where: {
+        OR: [
+          { requesterId: userId, addresseeId: friendId },
+          { requesterId: friendId, addresseeId: userId }
+        ]
+      }
+    });
+
+    if (!friendship) {
+      throw new Error("Friendship not found!");
+    }
+
+    await db.friendship.delete({
+      where: {
+        id: friendship.id
+      }
+    });
+
+    return { success: true };
+
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to delete friendship: ${error.message}`)
+    }
+    throw new Error("Failed to delete friendship")
+  }
+}
+
 export async function deleteMessageFriends(userId: string, messageId: string) {
   try {
     if (!messageId || !userId) {
