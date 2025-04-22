@@ -1,6 +1,8 @@
 # Discord Clone - Next.js 15+
 
-![Discord Clone Preview](hhttps://k75mjkjgco.ufs.sh/f/wiGIa3OsPCpWea8FORzpiwLd4IDv86s15lEKZqNb7tgaA2Fj)
+<p align="center">
+  <img src="https://k75mjkjgco.ufs.sh/f/wiGIa3OsPCpWea8FORzpiwLd4IDv86s15lEKZqNb7tgaA2Fj" alt="Preview">
+</p>
 
 Um clone completo do Discord com frontend moderno (Next.js 15+) e backend robusto, replicando as principais funcionalidades da plataforma.
 
