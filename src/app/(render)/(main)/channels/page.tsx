@@ -195,14 +195,12 @@ const Channels = () => {
   return (
     <div className="w-full h-full flex flex-col bg-background dark:bg-[#1A1A1E]">
       <div className="p-2 w-full h-full flex flex-col">
-        {/* header */}
         <HeaderChannels
           memBersList={memBersList}
           error={error?.message}
           name={channel?.name || "No name"}
           handleListMembers={handleListMembers}
         />
-
         <div className="flex w-full h-full relative overflow-hidden">
           <div className="flex flex-col w-full relative">
             <div className="h-[80px] relative"></div>
@@ -261,7 +259,6 @@ const Channels = () => {
                               <div className="w-full h-0.5 dark:bg-[#3f4248] bg-zinc-500"></div>
                             </div>
                           </div>
-
                           <RenderMessagens
                             allMessages={messages as any}
                             messagesEndRef={messagesEndRef}

@@ -102,7 +102,7 @@ const SideBarServers = ({ userId }: UserIdProps) => {
     try {
       await markAllMessagesAsRead(serverId, userId);
       toast.success("Todas as mensagens marcadas como lidas!");
-      refetch();
+      await refetch();
     } catch (error) {
       toast.error("Erro ao marcar mensagens:");
     }

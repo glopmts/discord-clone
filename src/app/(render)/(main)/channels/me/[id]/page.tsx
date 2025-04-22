@@ -1,54 +1,47 @@
 "use client";
 
-import { getMessagesFriends } from "@/app/actions/menssagens";
-import { getServersByUserId } from "@/app/actions/servers";
-import { deleteMessageFriends, getUserById } from "@/app/actions/user";
-import { IconBar } from "@/components/icons/IcnonsListFriends";
-import LoadingScreen from "@/components/loadingScreen";
+import { deleteMessageFriends } from "@/app/actions/user";
 import InputMenssagens from "@/components/servers/messages/input-menssagens";
 import RenderMessagens from "@/components/servers/messages/message-content-render";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMessagesFriends, userFriends, useServersByUserId, useUserMessages } from "@/hooks/me/chatFriendsHooks";
 import { socket } from "@/services/socket-io";
 import { formatMessageDate } from "@/utils/formatDate";
 import { useAuth } from "@clerk/nextjs";
 import { MessageFriends } from "@prisma/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Search } from "lucide-react";
-import { useParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Loader } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import ChatHeader from "../../components/chat-friends/ChatHeader";
+import CommonServers from "../../components/chat-friends/CommonServers";
+import FriendProfile from "../../components/chat-friends/FriendProfile";
 import SideBarRightUser from "./sideBar-rigth-user";
 
 
 const ChatFriends = () => {
   const { userId } = useAuth();
   const { id } = useParams<{ id: string; }>();
+
+  const router = useRouter();
   const [isOpen, setOpen] = useState(false);
   const [messageInput, setMessageInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [realTimeMessages, setRealTimeMessages] = useState<MessageFriends[]>([]);
   const [isAtBottom, setIsAtBottom] = useState(true);
+
   const queryClient = useQueryClient();
 
-  const {
-    data: friends,
-    isLoading,
-  } = useQuery({
-    queryKey: ["userMessages", id],
-    queryFn: () => getUserById(id!),
-  });
+
+  //Get user data
+  const { data: friends, isLoading } = useUserMessages(id!);
 
   const {
     data: currentUserServers,
     isLoading: isLoadingCurrentUserServers
-  } = useQuery({
-    queryKey: ["currentUserServers", userId],
-    queryFn: () => getServersByUserId(userId!),
-    enabled: !!userId
-  });
+  } = userFriends(userId!);
 
   const friendsClerck = friends?.clerk_id
   const friendId = friends?.clerk_id
@@ -56,22 +49,16 @@ const ChatFriends = () => {
   const {
     data: friendServers,
     isLoading: isLoadingFriendServers
-  } = useQuery({
-    queryKey: ["friendServers", friendsClerck],
-    queryFn: () => getServersByUserId(friendsClerck!),
-    enabled: !!friendsClerck
-  });
+  } = useServersByUserId(friendsClerck!);
 
   const {
     data: messages,
     refetch: refetchMessages,
     isLoading: isLoadingMessages
-  } = useQuery({
-    queryKey: ["messages_friends", userId, friendsClerck],
-    queryFn: () => getMessagesFriends(userId!, friendsClerck!),
-    enabled: !!friendsClerck || !!userId
-  });
+  } = useMessagesFriends(friendsClerck!, userId!);
 
+
+  /// Find common servers between current user and friend
   const findCommonServers = () => {
     if (!currentUserServers || !friendServers) return [];
 
@@ -82,6 +69,7 @@ const ChatFriends = () => {
 
   const commonServers = findCommonServers();
 
+  /// Check if the user is in the same server as the friend
   useEffect(() => {
     if (userId) {
       socket.emit('join_user_room', userId);
@@ -138,7 +126,6 @@ const ChatFriends = () => {
     }
   };
 
-
   const allMessages = useMemo(() => {
     const combined = [...(messages || []), ...(realTimeMessages || [])];
 
@@ -190,7 +177,7 @@ const ChatFriends = () => {
     }
   };
 
-
+  /// Handle delete message
   const handleDeleteMessage = async (messageId: string) => {
     try {
       await deleteMessageFriends(userId!, messageId);
@@ -215,48 +202,22 @@ const ChatFriends = () => {
   };
 
 
+  const handleServerClick = useCallback((serverId: string, channelId: string) => {
+    router.push(`/channels/?id=${serverId}&chaId=${channelId}`);
+  }, [id, router]);
+
+
   if (isLoading || isLoadingMessages) {
-    return <LoadingScreen />;
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Loader className="animate-spin" size={32} />
+      </div>
+    );
   }
 
   return (
-    <div className="w-full h-full overflow-hidden dark:bg-[#1A1A1E] bg-background text-gray-100">
-      {/* Header */}
-      <div className="w-full sticky top-0 z-50 dark:bg-[#1A1A1E] bg-background shadow-sm">
-        <div className="flex justify-between items-center px-4 py-2 border-b border-zinc-400 dark:border-[#1e1f22] w-full">
-          <div className="flex items-center gap-2">
-            <Avatar className="w-8 h-8 rounded-full">
-              <AvatarImage src={friends?.image!} alt={friends?.username!} />
-              <AvatarFallback className="bg-[#5865f2] text-white">
-                {friends?.username?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              <span className="font-semibold text-zinc-700 text-base dark:text-gray-100">{friends?.name}</span>
-              <span className="text-xs text-gray-400">{friends?.isOnline || "Offline"}</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <IconBar
-                onVoiceCall={handleVoiceCall}
-                onVideoCall={handleVideoCall}
-                onUserInfo={handleMenuInfor}
-                className="text-gray-400 dark:hover:text-gray-200"
-              />
-            </div>
-            <div className="w-[180px] relative">
-              <Input
-                placeholder="Buscar..."
-                className="w-full h-8 dark:bg-[#1e1f22] bg-zinc-400/30 text-sm border-none focus-visible:ring-0 text-gray-200 placeholder:text-gray-400"
-              />
-              <Search size={16} className="absolute top-2 right-2.5 text-gray-400" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
+    <div className="w-full h-full overflow-hidden dark:bg-[#1A1A1E] bg-background dark:text-gray-100">
+      <ChatHeader friend={friends!} onMenuToggle={handleMenuInfor} />
       <div className="flex flex-1 w-full overflow-hidden h-[calc(100vh-80px)]">
         <div className={`flex flex-col flex-1 overflow-hidden ${isOpen ? "w-[calc(100%-350px)]" : "w-full"}`}>
           <div className="flex flex-col w-full h-full p-4 overflow-hidden">
@@ -266,54 +227,13 @@ const ChatFriends = () => {
               onScroll={handleScroll}
             >
               <div className="flex flex-col gap-4  pb-8">
-                {/* Friend Profile */}
-                <div className="mt-4 flex flex-col">
-                  <Avatar className="w-20 h-20 dark:bg-[#1e1f22] bg-zinc-400/30 p-0.5 rounded-full border-4 border-zinc-400 dark:border-[#1e1f22]">
-                    <AvatarImage className="rounded-full object-cover" src={friends?.image!} alt={friends?.username!} />
-                    <AvatarFallback className="bg-[#5865f2] text-white">
-                      {friends?.username?.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col mt-3">
-                    <span className="font-semibold text-xl text-gray-100">{friends?.name}</span>
-                    <span className="text-sm text-gray-400">@{friends?.username}</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-gray-400 mt-4 text-center">
-                    <span>Este é o começo do seu histórico de mensagens diretas com</span>
-                    <span className="font-semibold dark:text-gray-200">{friends?.name}.</span>
-                  </div>
-                </div>
-
-                {/* Common Servers */}
-                <div className="w-full max-w-[600px] mt-3">
-                  {isLoadingCurrentUserServers || isLoadingFriendServers ? (
-                    <div className="flex justify-center">
-                      <span className="text-sm text-gray-400">Carregando servidores em comum...</span>
-                    </div>
-                  ) : commonServers.length > 0 ? (
-                    <div className="bg-[#2b2d31] rounded-lg p-3">
-                      <h3 className="text-xs font-semibold text-gray-400 mb-2">SERVIDORES EM COMUM</h3>
-                      <div className="flex flex-col gap-1">
-                        {commonServers.map(server => (
-                          <div key={server.id} className="flex items-center gap-2 p-2 hover:bg-[#35373c] rounded-md cursor-pointer">
-                            <Avatar className="w-8 h-8">
-                              <AvatarImage src={server.image!} />
-                              <AvatarFallback className="bg-[#5865f2] text-white">
-                                {server.name.charAt(0).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-sm text-gray-400">
-                      Nenhum servidor em comum
-                    </div>
-                  )}
-                </div>
-
-                {/* Messages */}
+                <FriendProfile friend={friends!} />
+                <CommonServers
+                  isLoadingCurrentUserServers={isLoadingCurrentUserServers}
+                  isLoadingFriendServers={isLoadingFriendServers}
+                  handleServerClick={handleServerClick}
+                  commonServers={commonServers!}
+                />
                 <div className="w-full">
                   {Object.entries(groupedMessages).map(([date, messages]) => (
                     <div key={date} className="mb-6 w-full">
@@ -326,7 +246,6 @@ const ChatFriends = () => {
                           <div className="w-full h-0.5 bg-[#3f4248]"></div>
                         </div>
                       </div>
-
                       <RenderMessagens
                         allMessages={messages as any}
                         messagesEndRef={messagesEndRef}
@@ -340,8 +259,6 @@ const ChatFriends = () => {
               </div>
             </ScrollArea>
           </div>
-
-          {/* Message Input */}
           <div className="sticky -bottom-1 dark:bg-[#1A1A1E] bg-background p-4 pt-0">
             <InputMenssagens
               name={friends?.name || "user"}
@@ -351,8 +268,6 @@ const ChatFriends = () => {
             />
           </div>
         </div>
-
-        {/* User Info Panel */}
         {isOpen && (
           <SideBarRightUser friends={friends!} />
         )}

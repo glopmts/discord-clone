@@ -300,7 +300,11 @@ export const getServersByUserId = async (userId: string) => {
         userId: userId
       },
       include: {
-        server: true
+        server: {
+          include: {
+            channels: true,
+          }
+        }
       }
     });
 
