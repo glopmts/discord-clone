@@ -7,9 +7,9 @@ import { HeadphoneOff, HeadphonesIcon, Loader, Mic, MicOffIcon, Settings } from 
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
-import ModalUserDetails from "./details-user-modal"
 import InterfacePageConfigs from "./Details-User-Screen"
-import { AlertEditeProfile } from "./modal-edite-profile"
+import ModalUserDetails from "./DetailsUserPop-Up"
+import { AlertEditeProfile } from "./EditeProfileModal"
 
 const ProfileHeader = ({ userId }: UserIdProps) => {
 

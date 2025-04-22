@@ -15,7 +15,7 @@ type UserModal = {
   onEditProfile: () => void;
 }
 
-const ModalUserDetails: FC<UserModal> = ({
+const DetailsUserPop: FC<UserModal> = ({
   isOpen,
   onClose,
   userId,
@@ -105,4 +105,4 @@ const ModalUserDetails: FC<UserModal> = ({
   );
 }
 
-export default ModalUserDetails;
+export default DetailsUserPop;

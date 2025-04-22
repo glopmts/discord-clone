@@ -9,8 +9,8 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { ModeToggle } from "../theme-button"
 import { Separator } from "../ui/separator"
+import { ProfileModal } from "./ProfileModal"
 import { getLinksNavegation } from "./details-props"
-import { InforPerfil } from "./infor-profile-screen"
 import StatusBar from "./status-bar-user"
 
 type ModalConfig = {
@@ -138,7 +138,7 @@ const InterfacePageConfigs = ({ onClose, userId, user, isOnline }: ModalConfig) 
                   </div>
                   {activeTab === "seguranca" && (
                     <div className="">
-                      <InforPerfil isOnline={isOnline} user={user!} />
+                      <ProfileModal isOnline={isOnline} user={user!} />
                     </div>
                   )}
                   {activeTab === "status" && (

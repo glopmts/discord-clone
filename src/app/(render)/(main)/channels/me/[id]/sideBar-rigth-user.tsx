@@ -1,6 +1,6 @@
 import DetailsFriendsModal from "@/components/modals/DirectMessageModal";
 import { Button } from "@/components/ui/button";
-import InforUserImage from "@/components/user/infor-user-image";
+import InforUserImage from "@/components/user/ImageUserPerfil";
 import useDominantColor from "@/hooks/useDominantColor";
 import { formatDateComplete } from "@/utils/formatDate";
 import { User } from "@prisma/client";

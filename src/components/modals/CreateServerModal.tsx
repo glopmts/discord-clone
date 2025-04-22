@@ -15,7 +15,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { ImageUploader } from "../user/imageProfileUpload";
+import { ImageUploader } from "../user/UploadImagesProfile";
 
 export default function ModalCreateServer({
   isOpen,

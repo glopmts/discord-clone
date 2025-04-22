@@ -55,7 +55,7 @@ const SecuritySection = ({
   </div>
 )
 
-export const InforPerfil = ({ user, isOnline }: UserInfoProps) => {
+export const ProfileModal = ({ user, isOnline }: UserInfoProps) => {
   const userInitial = user.username?.charAt(0).toUpperCase() || ""
 
   return (

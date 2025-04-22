@@ -3,7 +3,7 @@
 import Header from "@/components/Header"
 import SideBarServes from "@/components/servers/ServerList"
 import SiderBarInfors from "@/components/servers/ServerViewManager"
-import ProfileHeader from "@/components/user/profile-header"
+import ProfileHeader from "@/components/user/ProfileBottom"
 import { useSyncOnlineStatus } from "@/hooks/useUpdateOnlineStatus"
 import { useAuth } from "@clerk/nextjs"
 

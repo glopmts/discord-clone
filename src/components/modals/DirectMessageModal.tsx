@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import ErrorMenssage from "../ErrorMenssage";
 import { getStatusButton } from "../getStatusButton";
 import { Button } from "../ui/button";
-import InforUserImage from "../user/infor-user-image";
+import InforUserImage from "../user/ImageUserPerfil";
 
 type MenuDetailsProps = {
   selectId: string;

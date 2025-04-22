@@ -15,7 +15,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { ImageUploader } from "./imageProfileUpload";
+import { ImageUploader } from "./UploadImagesProfile";
 
 type ModalAlert = {
   isOpen: boolean;
@@ -62,7 +62,7 @@ export function AlertEditeProfile({ isOpen, onClose, user, userId, refetch }: Mo
 
   return (
     <AlertDialog open={isOpen}>
-      <AlertDialogContent className="dark:bg-[#1f1f22] bg-background border">
+      <AlertDialogContent className="dark:bg-[#1f1f22] bg-background border z-[360]">
         <AlertDialogHeader>
           <AlertDialogTitle>Editar perfil</AlertDialogTitle>
           <AlertDialogDescription>
