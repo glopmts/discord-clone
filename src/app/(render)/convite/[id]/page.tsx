@@ -17,7 +17,7 @@ export default function ConviteClient() {
   const { userId, isLoaded } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadCreate, setIsLoadCreate] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   const [server, setServer] = useState({
     serverId: "",

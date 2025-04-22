@@ -1,4 +1,4 @@
-import DetailsFriendsModal from "@/components/modals/user-directmessages-modal";
+import DetailsFriendsModal from "@/components/modals/DirectMessageModal";
 import { Button } from "@/components/ui/button";
 import InforUserImage from "@/components/user/infor-user-image";
 import useDominantColor from "@/hooks/useDominantColor";

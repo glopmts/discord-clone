@@ -3,11 +3,11 @@
 import { getChannelId } from "@/app/actions/channels";
 import { expelsMember } from "@/app/actions/member-servers";
 import { deleteMessage } from "@/app/actions/menssagens";
-import { geServer } from "@/app/actions/servers";
-import MemberServer from "@/components/infor-bar/member-server";
+import MemberServer from "@/components/infor-bar/ServerMember";
 import InputMenssagens from "@/components/servers/messages/input-menssagens";
 import RenderMessagens from "@/components/servers/messages/message-content-render";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useServerData } from "@/hooks/sidebar-infor-server/userDataHooks";
 import { socket } from "@/services/socket-io";
 import { MessageProps } from "@/types/interfaces";
 import { formatMessageDate } from "@/utils/formatDate";
@@ -47,10 +47,9 @@ const Channels = () => {
   const {
     data: server,
     isLoading: loaderServer,
-  } = useQuery({
-    queryKey: ["server", serverId],
-    queryFn: () => geServer(serverId!),
-  });
+    error: serverError,
+    refetch
+  } = useServerData(id);
 
 
   useEffect(() => {

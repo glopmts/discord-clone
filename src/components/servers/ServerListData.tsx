@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useMenuModalHandler } from "@/hooks/useMenuModalHandler";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { optionsContextMenuSever } from "../infor-bar/context-menu-options";
+import { optionsContextMenuSever } from "../infor-bar/ContextMenuOptions";
 
 type RenderServersProps = {
   servers: {

@@ -59,7 +59,7 @@ export async function getUserServersWithUnreadCount(userId: string) {
   }
 }
 
-export async function geServer(id: string) {
+export async function getServer(id: string) {
   try {
 
     if (!id) {

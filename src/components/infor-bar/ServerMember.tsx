@@ -7,7 +7,7 @@ import { Roles } from "@prisma/client";
 import { Ban, MessageSquare, MoreVertical, User as UserIcon } from "lucide-react";
 import { useState } from "react";
 import ContextMenuGlobe from "../ContextMenu";
-import DetailsMembers from "../modals/details-members-modal";
+import DetailsMembers from "../modals/MemberDetailsModal";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 

@@ -35,9 +35,8 @@ const PendingFriends = ({ userId }: UserIdProps) => {
         setLoader(false)
         refetch()
       })
-      .catch(error => {
+      .catch(() => {
         toast.error("Error ao deletar o pedido")
-        console.log(error)
         setLoader(false)
       })
   }

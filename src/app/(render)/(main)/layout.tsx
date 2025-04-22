@@ -1,8 +1,8 @@
 "use client"
 
 import Header from "@/components/Header"
-import SiderBarInfors from "@/components/servers/sideBar-Infor-Servers"
-import SideBarServes from "@/components/servers/sideBar-servers"
+import SideBarServes from "@/components/servers/ServerList"
+import SiderBarInfors from "@/components/servers/ServerViewManager"
 import ProfileHeader from "@/components/user/profile-header"
 import { useSyncOnlineStatus } from "@/hooks/useUpdateOnlineStatus"
 import { useAuth } from "@clerk/nextjs"

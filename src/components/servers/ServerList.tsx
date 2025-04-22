@@ -13,9 +13,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import LoadingScreen from "../loadingScreen";
-import ConviteUserServer from "../modals/convite-users-server";
-import ModalCreateServer from "../modals/modal-news-servers";
-import RenderSideBarServer from "./sideBar-Servers-Render";
+import ModalCreateServer from "../modals/CreateServerModal";
+import ConviteUserServer from "../modals/InviteUsersModal";
+import RenderSideBarServer from "./ServerListData";
 
 const SideBarServers = ({ userId }: UserIdProps) => {
   const router = useRouter();
@@ -71,7 +71,6 @@ const SideBarServers = ({ userId }: UserIdProps) => {
       await exitServer(userId, serverId);
       toast.success("Saiu do servidor com sucesso!");
     } catch (error) {
-      console.log(error);
       toast.error("Erro ao sair do servidor");
     }
   }
@@ -85,7 +84,6 @@ const SideBarServers = ({ userId }: UserIdProps) => {
       await exitServer(userId, serverId);
       toast.success("Servidor deletado com sucesso!");
     } catch (error) {
-      console.log(error);
       toast.error("Erro ao deletar o servidor");
     }
   }
@@ -194,4 +192,4 @@ const SideBarServers = ({ userId }: UserIdProps) => {
   )
 }
 
-export default SideBarServers
+export default SideBarServers;

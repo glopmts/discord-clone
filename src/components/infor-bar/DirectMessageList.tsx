@@ -6,7 +6,7 @@ import { Store, Users } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import UserMessageItem from "./userMessageItem";
+import UserMessageItem from "./MessageItem";
 
 const links = () => [
   {

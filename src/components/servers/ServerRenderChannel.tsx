@@ -5,11 +5,12 @@ import { InterfacesRender } from "@/types/interfaces"
 import { Calendar, LucideListMinus, Plus, Users } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
 import { Button } from "../ui/button"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu"
 import { Separator } from "../ui/separator"
-import { MenuItemsInforServer } from "./Items-Servers-Channels"
+import { MenuItemsInforServer } from "./ServerItems"
 
 // Tipos melhorados
 type CategoryActionsProps = {
@@ -123,7 +124,6 @@ const RenderServerChannels = ({
             const count = await getUnreadMessagesCount(userId, channel.id);
             counts[channel.id] = count;
           } catch (error) {
-            console.error(`Error fetching unread count for channel ${channel.id}:`, error);
             counts[channel.id] = 0;
           }
         }
@@ -143,7 +143,7 @@ const RenderServerChannels = ({
       }
       router.push(`/channels/?id=${server.id}&chaId=${channelId}`);
     } catch (error) {
-      console.error("Error marking messages as read:", error);
+      toast.error("Erro ao marcar mensagens como lidas.");
     }
   };
 
@@ -170,7 +170,7 @@ const RenderServerChannels = ({
         return newSet;
       });
     } catch (error) {
-      console.error("Error toggling category:", error);
+      toast.error("Erro ao atualizar a categoria.");
     }
   };
 

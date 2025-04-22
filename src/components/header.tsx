@@ -1,6 +1,6 @@
 "use client";
 
-import { geServer } from "@/app/actions/servers";
+import { getServer } from "@/app/actions/servers";
 import { acceptFriends, getPendingFriendRequests } from "@/app/actions/user";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
@@ -9,7 +9,7 @@ import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import ModalInfor from "./modals/ModalCustom";
+import ModalInfor from "./modals/CustomModal";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
@@ -24,7 +24,7 @@ const Header = () => {
 
   const { data: server } = useQuery({
     queryKey: ["server", id],
-    queryFn: () => (id ? geServer(id) : null),
+    queryFn: () => (id ? getServer(id) : null),
     enabled: !!id,
   });
 
